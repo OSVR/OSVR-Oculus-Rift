@@ -29,18 +29,18 @@
 #include <iostream>
 
 void createOculusRift(VRPNMultiserverData &data, OSVR_PluginRegContext ctx, const char *params) {
-    std::cout << "-- createOculusRift() called." << std::endl;
     Json::Reader reader;
     Json::Value root;
     if (!reader.parse(params, root)) {
-        throw std::runtime_error("Could not parse configuration: " +
-                                 reader.getFormattedErrorMessages());
+        std::cerr << "-- createOculusRift(): ERROR: Could not parse configuration: " << reader.getFormattedErrorMessages() << std::endl;
+        throw std::runtime_error("Could not parse configuration: " + reader.getFormattedErrorMessages());
     }
-    int hmd_index = root["index", 0].asInt();
-    std::string hmd_type = root["type", "dk2"].asString();
 
-    std::cout << "-- createOculusRift(): Registering OculusRift device with server." << std::endl;
+    int hmd_index = root.get("index", 0).asInt();
+    std::string hmd_type = root.get("type", "dk2").asString();
+
     osvr::vrpnserver::VRPNDeviceRegistration reg(ctx);
 
     reg.registerDevice(new vrpn_Tracker_OculusRift(reg.useDecoratedName(data.getName("OculusRift")).c_str(), reg.getVRPNConnection(), hmd_index, hmd_type.c_str()));
 }
+

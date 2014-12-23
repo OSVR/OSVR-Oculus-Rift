@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    "org_opengoggles_OculusRift"
+  ],
+  "drivers": [
+    {
+      "plugin": "org_opengoggles_OculusRift",
+      "driver": "OculusRift",
+      "params": {
+        "index": 0,
+        "type": "dk2"
+      }
+    }
+  ]
+}
