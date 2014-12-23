@@ -23,24 +23,16 @@
 #include <osvr/VRPNServer/VRPNDeviceRegistration.h>
 
 // Library/third-party includes
-#include "hidapi/hidapi.h"
 #include "vrpn_Connection.h"
 #include "vrpn_Tracker_OculusRift.h"
-#include <boost/noncopyable.hpp>
-#include <json/reader.h>
-#include <json/value.h>
 
 // Standard includes
-#include <iostream>
+// - none
 
 OSVR_PLUGIN(org_opengoggles_bundled_Multiserver) {
-    std::cout << "-- Creating plugin context..." << std::endl;
     osvr::pluginkit::PluginContext context(ctx);
 
-    std::cout << "-- Registering VRPN multiserver data..." << std::endl;
     VRPNMultiserverData &data = *context.registerObjectForDeletion(new VRPNMultiserverData);
-
-    std::cout << "-- Registering driver instantiation callback..." << std::endl;
     osvrRegisterDriverInstantiationCallback(ctx, "OculusRift", &wrappedConstructor<&createOculusRift>, &data);
 
     return OSVR_RETURN_SUCCESS;

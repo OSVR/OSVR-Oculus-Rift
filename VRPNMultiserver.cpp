@@ -23,7 +23,6 @@
 // - none
 
 // Standard includes
-#include <iostream>
 #include <sstream>
 
 std::string VRPNMultiserverData::getName(std::string const &nameStem) {
@@ -42,3 +41,4 @@ size_t VRPNMultiserverData::assignNumber(std::string const &nameStem) {
     m_nameCount[nameStem] = 0;
     return 0;
 }
+
