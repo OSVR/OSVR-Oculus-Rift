@@ -1,0 +1,58 @@
+{
+  "deviceVendor": "Oculus VR",
+  "deviceName": "Oculus Rift",
+  "author": "Kevin M. Godby <kevin@godby.org>",
+  "version": 1,
+  "lastModified": "2014-12-20T20:35:13Z",
+  "index": 0,
+  "type": "dk2",
+  "interfaces": {
+    "tracker": {
+      "count": 3,
+      "position": true,
+      "orientation": true
+    },
+    "analog": {
+      "count": 10,
+      "traits": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
+    },
+  },
+  "semantics": {
+    "hmd": {
+      "$target": "tracker/0",
+      "accelerometer": {
+        "x": "analog/0",
+        "y": "analog/1",
+        "z": "analog/2"
+      },
+      "gyroscope": {
+        "x": "analog/3",
+        "y": "analog/4",
+        "z": "analog/5"
+      },
+      "magnetometer": {
+        "x": "analog/6",
+        "y": "analog/7",
+        "z": "analog/8"
+      },
+      "temperature": "analog/9"
+    },
+    "camera": {
+      "$target": "tracker/1",
+    },
+    "leveled camera": {
+      "$target": "tracker/2"
+    }
+  }
+}
