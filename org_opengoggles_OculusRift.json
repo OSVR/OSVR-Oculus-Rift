@@ -5,7 +5,6 @@
   "version": 1,
   "lastModified": "2014-12-20T20:35:13Z",
   "index": 0,
-  "type": "dk2",
   "interfaces": {
     "tracker": {
       "count": 3,

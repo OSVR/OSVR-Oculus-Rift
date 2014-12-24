@@ -36,11 +36,15 @@ void createOculusRift(VRPNMultiserverData &data, OSVR_PluginRegContext ctx, cons
         throw std::runtime_error("Could not parse configuration: " + reader.getFormattedErrorMessages());
     }
 
-    int hmd_index = root.get("index", 0).asInt();
-    std::string hmd_type = root.get("type", "dk2").asString();
+    int hmd_index = 0;
+    try {
+        hmd_index = root.get("index", 0).asInt();
+    } catch (const std::exception& e) {
+        std::cerr << "Caught exception HMD index from config file: " << e.what() << std::endl;
+    }
 
     osvr::vrpnserver::VRPNDeviceRegistration reg(ctx);
 
-    reg.registerDevice(new vrpn_Tracker_OculusRift(reg.useDecoratedName(data.getName("OculusRift")).c_str(), reg.getVRPNConnection(), hmd_index, hmd_type.c_str()));
+    reg.registerDevice(new vrpn_Tracker_OculusRift(reg.useDecoratedName(data.getName("OculusRift")).c_str(), reg.getVRPNConnection(), hmd_index));
 }
 
