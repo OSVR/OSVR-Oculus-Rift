@@ -170,6 +170,12 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	endif()
 endif()
 
+# Windows-only dependencies
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+	list(APPEND _ovr_dependency_libraries winmm)
+	list(APPEND _ovr_dependency_libraries Ws2_32)
+endif()
+
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OVR
 	DEFAULT_MSG
