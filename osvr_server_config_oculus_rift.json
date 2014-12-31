@@ -7,7 +7,7 @@
       "destination": "/me/head",
       "source": {
         "child": {
-          "tracker": "org_opengoggles_OculusRift/OculusRift0",
+          "tracker": "/org_opengoggles_OculusRift/OculusRift0",
           "sensor": 0
         }
       }
