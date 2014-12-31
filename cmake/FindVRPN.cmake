@@ -103,10 +103,12 @@ if(NOT WIN32)
 	list(APPEND _deps_check CMAKE_HAVE_THREADS_LIBRARY)
 endif()
 
-find_package(Libusb1)
-list(APPEND _deps_libs ${LIBUSB1_LIBRARIES})
-list(APPEND _deps_includes ${LIBUSB1_INCLUDE_DIRS})
-list(APPEND _deps_check LIBUSB1_FOUND)
+if(WIN32)
+	find_package(Libusb1)
+	list(APPEND _deps_libs ${LIBUSB1_LIBRARIES})
+	list(APPEND _deps_includes ${LIBUSB1_INCLUDE_DIRS})
+	list(APPEND _deps_check LIBUSB1_FOUND)
+endif()
 
 
 # handle the QUIETLY and REQUIRED arguments and set xxx_FOUND to TRUE if
