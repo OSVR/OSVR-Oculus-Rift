@@ -50,7 +50,7 @@
     "camera": {
       "$target": "tracker/1",
     },
-    "leveled camera": {
+    "leveled_camera": {
       "$target": "tracker/2"
     }
   }
