@@ -1,13 +1,13 @@
 {
   "plugins": [
-    "org_opengoggles_OculusRift"
+    "com_osvr_OculusRift"
   ],
   "routes": [
     {
       "destination": "/me/head",
       "source": {
         "child": {
-          "tracker": "/org_opengoggles_OculusRift/OculusRift0",
+          "tracker": "/com_osvr_OculusRift/OculusRift0",
           "sensor": 0
         }
       }
@@ -15,7 +15,7 @@
   ],
   "drivers": [
     {
-      "plugin": "org_opengoggles_OculusRift",
+      "plugin": "com_osvr_OculusRift",
       "driver": "OculusRift",
       "params": {
         "index": 0

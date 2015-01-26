@@ -29,7 +29,7 @@
 // Standard includes
 // - none
 
-OSVR_PLUGIN(org_opengoggles_bundled_Multiserver) {
+OSVR_PLUGIN(com_osvr_bundled_Multiserver) {
     osvr::pluginkit::PluginContext context(ctx);
 
     VRPNMultiserverData &data = *context.registerObjectForDeletion(new VRPNMultiserverData);
