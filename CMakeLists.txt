@@ -4,14 +4,12 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(org_opengoggles_OculusRift)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-
-#include(CompilerFeatures)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 find_package(osvr REQUIRED)
 find_package(VRPN REQUIRED)
 find_package(OVR REQUIRED)
-find_package(Boost 1.43 REQUIRED) # Lower version bound of 1.43 for range adapters
+find_package(jsoncpp REQUIRED)
 
 osvr_add_plugin(org_opengoggles_OculusRift org_opengoggles_OculusRift.cpp
     DevicesWithParameters.cpp
@@ -19,18 +17,20 @@ osvr_add_plugin(org_opengoggles_OculusRift org_opengoggles_OculusRift.cpp
     VRPNMultiserver.cpp
     VRPNMultiserver.h)
 
-target_include_directories(org_opengoggles_OculusRift PUBLIC ${OSVR_INCLUDE_DIRS})
-target_include_directories(org_opengoggles_OculusRift PUBLIC ${VRPN_INCLUDE_DIRS})
-target_include_directories(org_opengoggles_OculusRift PUBLIC ${OVR_INCLUDE_DIRS})
-target_include_directories(org_opengoggles_OculusRift PUBLIC ${Boost_INCLUDE_DIRS})
+target_include_directories(org_opengoggles_OculusRift
+    PUBLIC
+    ${VRPN_INCLUDE_DIRS}
+    ${OVR_INCLUDE_DIRS}
+    ${Boost_INCLUDE_DIRS})
 
-# This example uses the C++ wrapper, as suggested, so you'll need this line.
-target_link_libraries(org_opengoggles_OculusRift osvr::osvrPluginKitCpp)
-target_link_libraries(org_opengoggles_OculusRift osvr::osvrConnection)
-target_link_libraries(org_opengoggles_OculusRift ${VRPN_SERVER_LIBRARIES} ${VRPN_LIBRARIES})
-target_link_libraries(org_opengoggles_OculusRift ${OVR_LIBRARIES})
-target_link_libraries(org_opengoggles_OculusRift osvr::osvrPluginHost)
-target_link_libraries(org_opengoggles_OculusRift osvr::osvrVRPNServer)
+target_link_libraries(org_opengoggles_OculusRift
+    osvr::osvrPluginKitCpp
+    osvr::osvrConnection
+    ${VRPN_SERVER_LIBRARIES}
+    osvr::osvrPluginHost
+    osvr::osvrVRPNServer
+    ${OVR_LIBRARIES}
+    jsoncpp_lib)
 
 #target_compile_options(org_opengoggles_OculusRift
 #    PRIVATE

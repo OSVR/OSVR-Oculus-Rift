@@ -105,9 +105,10 @@ endif()
 
 if(WIN32)
 	find_package(Libusb1)
-	list(APPEND _deps_libs ${LIBUSB1_LIBRARIES})
-	list(APPEND _deps_includes ${LIBUSB1_INCLUDE_DIRS})
-	list(APPEND _deps_check LIBUSB1_FOUND)
+	if(LIBUSB1_FOUND)
+		list(APPEND _deps_libs ${LIBUSB1_LIBRARIES})
+		list(APPEND _deps_includes ${LIBUSB1_INCLUDE_DIRS})
+	endif()
 endif()
 
 
