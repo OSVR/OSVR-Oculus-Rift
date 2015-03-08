@@ -36,3 +36,11 @@ target_link_libraries(com_osvr_OculusRift
 #    DESTINATION "${CMAKE_INSTALL_DOCDIR}/device-descriptors"
 #    COMPONENT Doc)
 
+install(FILES
+    osvr_server_config.oculusrift.sample.json
+    CONTRIBUTING.md
+    README.md
+    LICENSE
+    NOTICE
+    DESTINATION .)
+
