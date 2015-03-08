@@ -1,7 +1,5 @@
 {
-  "plugins": [
-    "com_osvr_OculusRift"
-  ],
+  "plugins": [],
   "routes": [
     {
       "destination": "/me/head",
