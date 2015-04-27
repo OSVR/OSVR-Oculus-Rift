@@ -25,6 +25,9 @@
 // Internal Includes
 #include "DevicesWithParameters.h"
 #include <osvr/VRPNServer/VRPNDeviceRegistration.h>
+#include <osvr/Util/StringLiteralFileToString.h>
+
+#include "com_osvr_OculusRift_json.h"
 
 // Library/third-party includes
 #include <json/reader.h>
@@ -53,5 +56,6 @@ void createOculusRift(VRPNMultiserverData &data, OSVR_PluginRegContext ctx, cons
     osvr::vrpnserver::VRPNDeviceRegistration reg(ctx);
 
     reg.registerDevice(new vrpn_Tracker_OculusRift(reg.useDecoratedName(data.getName("OculusRift")).c_str(), reg.getVRPNConnection(), hmd_index));
+    reg.setDeviceDescriptor(osvr::util::makeString(com_osvr_OculusRift_json));
 }
 
