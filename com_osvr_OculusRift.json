@@ -25,7 +25,7 @@
         {},
         {}
       ]
-    },
+    }
   },
   "semantics": {
     "hmd": {
@@ -48,7 +48,7 @@
       "temperature": "analog/9"
     },
     "camera": {
-      "$target": "tracker/1",
+      "$target": "tracker/1"
     },
     "leveled_camera": {
       "$target": "tracker/2"
