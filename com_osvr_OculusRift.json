@@ -1,39 +1,57 @@
 {
-  "hmd": {
-    "device": {
-      "vendor": "Oculus",
-      "model": "Rift DK2",
-      "Version": "1.0",
-      "Note": ""
+  "deviceVendor": "Oculus VR",
+  "deviceName": "Oculus Rift",
+  "author": "Kevin M. Godby <kevin@godby.org>",
+  "version": 1,
+  "lastModified": "2014-12-20T20:35:13Z",
+  "index": 0,
+  "interfaces": {
+    "tracker": {
+      "count": 3,
+      "position": true,
+      "orientation": true
     },
-    "field_of_view": {
-      "monocular_horizontal": 93.2798,
-      "monocular_vertical": 106.092,
-      "overlap_percent": 100,
-      "pitch_tilt": 0
+    "analog": {
+      "count": 10,
+      "traits": [
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        {}
+      ]
     },
-    "resolutions": [
-      {
-        "width": 1920,
-        "height": 1080,
-        "video_inputs": 1,
-        "display_mode": "horz_side_by_side"
-      }
-    ],
-    "distortion": {
-      "k1_red": 1.01999,
-      "k1_green": 1.248,
-      "k1_blue": 1.48601
+  },
+  "semantics": {
+    "hmd": {
+      "$target": "tracker/0",
+      "accelerometer": {
+        "x": "analog/0",
+        "y": "analog/1",
+        "z": "analog/2"
+      },
+      "gyroscope": {
+        "x": "analog/3",
+        "y": "analog/4",
+        "z": "analog/5"
+      },
+      "magnetometer": {
+        "x": "analog/6",
+        "y": "analog/7",
+        "z": "analog/8"
+      },
+      "temperature": "analog/9"
     },
-    "rendering": {
-      "right_roll": 0,
-      "left_roll": 0
+    "camera": {
+      "$target": "tracker/1",
     },
-    "eyes": [
-      {
-        "center_proj_x": 0.5,
-        "center_proj_y": 0.5
-      }
-    ]
+    "leveled_camera": {
+      "$target": "tracker/2"
+    }
   }
 }
