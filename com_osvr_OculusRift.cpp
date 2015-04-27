@@ -39,9 +39,10 @@
 OSVR_PLUGIN(com_osvr_bundled_Multiserver) {
     osvr::pluginkit::PluginContext context(ctx);
 
-    VRPNMultiserverData &data = *context.registerObjectForDeletion(new VRPNMultiserverData);
-    osvrRegisterDriverInstantiationCallback(ctx, "OculusRift", &wrappedConstructor<&createOculusRift>, &data);
+    VRPNMultiserverData &data =
+        *context.registerObjectForDeletion(new VRPNMultiserverData);
+    osvrRegisterDriverInstantiationCallback(
+        ctx, "OculusRift", &wrappedConstructor<&createOculusRift>, &data);
 
     return OSVR_RETURN_SUCCESS;
 }
-

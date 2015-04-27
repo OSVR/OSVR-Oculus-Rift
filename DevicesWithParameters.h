@@ -34,10 +34,13 @@
 // Standard includes
 // - none
 
-typedef void (*DriverConstructor)(VRPNMultiserverData &data, OSVR_PluginRegContext ctx, const char *params);
+typedef void (*DriverConstructor)(VRPNMultiserverData &data,
+                                  OSVR_PluginRegContext ctx,
+                                  const char *params);
 
 template <DriverConstructor F>
-OSVR_ReturnCode wrappedConstructor(OSVR_PluginRegContext ctx, const char *params, void *userData) {
+OSVR_ReturnCode wrappedConstructor(OSVR_PluginRegContext ctx,
+                                   const char *params, void *userData) {
     VRPNMultiserverData *data = static_cast<VRPNMultiserverData *>(userData);
     try {
         F(*data, ctx, params);
@@ -47,7 +50,7 @@ OSVR_ReturnCode wrappedConstructor(OSVR_PluginRegContext ctx, const char *params
     }
 }
 
-void createOculusRift(VRPNMultiserverData &data, OSVR_PluginRegContext ctx, const char *params);
+void createOculusRift(VRPNMultiserverData &data, OSVR_PluginRegContext ctx,
+                      const char *params);
 
 #endif // INCLUDED_DevicesWithParameters_h_GUID_45B7C6E9_990B_4FF0_9EB2_209089781143
-

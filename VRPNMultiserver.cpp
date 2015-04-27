@@ -48,4 +48,3 @@ size_t VRPNMultiserverData::assignNumber(std::string const &nameStem) {
     m_nameCount[nameStem] = 0;
     return 0;
 }
-

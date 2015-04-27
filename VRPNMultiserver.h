@@ -49,4 +49,3 @@ class VRPNMultiserverData {
 };
 
 #endif // INCLUDED_VRPNMultiserver_h_GUID_05913DEF_7B12_4089_FE38_379BEF4A1A7D
-
