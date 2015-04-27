@@ -16,7 +16,7 @@
       "traits": [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}]
     }
   },
-  "semantics": {
+  "semantic": {
     "hmd": {
       "$target": "tracker/0",
       "accelerometer": {
