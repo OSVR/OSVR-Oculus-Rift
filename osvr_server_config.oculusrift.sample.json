@@ -1,16 +1,4 @@
 {
-  "plugins": [],
-  "routes": [
-    {
-      "destination": "/me/head",
-      "source": {
-        "child": {
-          "tracker": "/com_osvr_OculusRift/OculusRift0",
-          "sensor": 0
-        }
-      }
-    }
-  ],
   "drivers": [
     {
       "plugin": "com_osvr_OculusRift",
