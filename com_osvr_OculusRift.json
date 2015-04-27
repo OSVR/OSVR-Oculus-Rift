@@ -42,5 +42,8 @@
     "leveled_camera": {
       "$target": "tracker/2"
     }
+  },
+  "automaticAliases": {
+    "/me/head": "semantic/hmd"
   }
 }
