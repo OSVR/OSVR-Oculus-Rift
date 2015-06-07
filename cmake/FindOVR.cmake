@@ -27,28 +27,84 @@ set(OVR_ROOT_DIR
 	"Directory to search for Oculus SDK")
 
 # The OVR library is built in a directory tree that varies based on platform,
-# architecture, and compiler.
+# architecture, and compiler. Unfortunately, the directory tree and library
+# names change from version to version.
 #
-# The libraries live in one of the following locations:
+# Oculus SDK 0.4.x
 #
+# Lib/Linux/Debug/i386/libovr.a
+# Lib/Linux/Debug/x86_64/libovr.a
+# Lib/Linux/Release/i386/libovr.a
+# Lib/Linux/Release/x86_64/libovr.a
+# Lib/Mac/Debug/libovr.a
+# Lib/Mac/Release/libovr.a
+# Lib/Win32/VS2010/libovrd.lib
+# Lib/Win32/VS2010/libovr.lib
 # Lib/Win32/VS2012/libovrd.lib
 # Lib/Win32/VS2012/libovr.lib
 # Lib/Win32/VS2013/libovrd.lib
 # Lib/Win32/VS2013/libovr.lib
-# Lib/Win32/VS2010/libovrd.lib
-# Lib/Win32/VS2010/libovr.lib
+# Lib/x64/VS2010/libovr64d.lib
+# Lib/x64/VS2010/libovr64.lib
 # Lib/x64/VS2012/libovr64d.lib
 # Lib/x64/VS2012/libovr64.lib
 # Lib/x64/VS2013/libovr64d.lib
 # Lib/x64/VS2013/libovr64.lib
-# Lib/x64/VS2010/libovr64d.lib
-# Lib/x64/VS2010/libovr64.lib
-# Lib/Linux/Release/x86_64/libovr.a
-# Lib/Linux/Debug/x86_64/libovr.a
-# Lib/Linux/Release/i386/libovr.a
-# Lib/Linux/Debug/i386/libovr.a
-# Lib/Mac/Release/libovr.a
-# Lib/Mac/Debug/libovr.a
+#
+# Oculus 0.5.x
+#
+# Lib/Linux/i386/Debug/libOVR.a
+# Lib/Linux/i386/Debug/libOVRRT32_0.so.5.0.1
+# Lib/Linux/i386/Release/libOVR.a
+# Lib/Linux/i386/Release/libOVRRT32_0.so.5.0.1
+# Lib/Linux/x86_64/Debug/libOVR.a
+# Lib/Linux/x86_64/Debug/libOVRRT64_0.so.5.0.1
+# Lib/Linux/x86_64/Release/libOVR.a
+# Lib/Linux/x86_64/Release/libOVRRT64_0.so.5.0.1
+# Lib/Windows/Win32/Debug/VS2010/LibOVR.lib
+# Lib/Windows/Win32/Debug/VS2012/LibOVR.lib
+# Lib/Windows/Win32/Debug/VS2013/LibOVR.lib
+# Lib/Windows/Win32/Release/VS2010/LibOVR.lib
+# Lib/Windows/Win32/Release/VS2012/LibOVR.lib
+# Lib/Windows/Win32/Release/VS2013/LibOVR.lib
+# Lib/Windows/x64/Debug/VS2010/LibOVR.lib
+# Lib/Windows/x64/Debug/VS2012/LibOVR.lib
+# Lib/Windows/x64/Debug/VS2013/LibOVR.lib
+# Lib/Windows/x64/Release/VS2010/LibOVR.lib
+# Lib/Windows/x64/Release/VS2012/LibOVR.lib
+# Lib/Windows/x64/Release/VS2013/LibOVR.lib
+#
+# Oculus 0.6.x
+#
+# Lib/Windows/Win32/Release/VS2010/LibOVR.lib
+# Lib/Windows/Win32/Release/VS2012/LibOVR.lib
+# Lib/Windows/Win32/Release/VS2013/LibOVR.lib
+# Lib/Windows/x64/Release/VS2010/LibOVR.lib
+# Lib/Windows/x64/Release/VS2012/LibOVR.lib
+# Lib/Windows/x64/Release/VS2013/LibOVR.lib
+#
+# Library path locations:
+#
+# ROOT + "Lib" + OS + BUILD + ARCH
+# ROOT + "Lib" + OS + BUILD
+# ROOT + "Lib" + ARCH + COMP
+# ROOT + "Lib" + OS + ARCH + BUILD
+# ROOT + "Lib" + OS + ARCH + BUILD + COMP
+#
+# Library filenames:
+#
+# libovr64d.lib
+# libovr64.lib
+# libovr.a
+# libOVR.a
+# libovr.ax64
+# libovrd.lib
+# libovr.lib
+# LibOVR.lib
+# libOVRRT32_0.so.5.0.1
+# libOVRRT64_0.so.5.0.1
+#
+
 
 set(OVR_LIBRARY_PATH_SUFFIX "Lib")
 
@@ -79,38 +135,60 @@ endif()
 
 # Test platform
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	set(OVR_LIBRARY_PATH_SUFFIX_START "Lib/Linux") # needs build type and arch
+	set(_ovr_operating_system "Linux")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-	set(OVR_LIBRARY_PATH_SUFFIX_START "Lib/Mac") # needs build type
+	set(_ovr_operating_system "Mac")
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-	set(OVR_LIBRARY_PATH_SUFFIX "Lib/${_ovr_library_arch}/${_ovr_library_compiler}")
+	set(_ovr_operating_system "Windows")
 endif()
+
+# Generate list of potential library locations
+list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release/${_ovr_library_arch})
+list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release)
+list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release)
+list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release/${_ovr_library_compiler})
+list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Release/${_ovr_library_compiler})
+list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug/${_ovr_library_arch})
+list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug)
+list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug)
+list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
+list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
+
+# Generate list of potential library names
+list(APPEND _ovr_library_names libovr.ax${_ovr_libname_bitsuffix})
+list(APPEND _ovr_library_names ovr)
+list(APPEND _ovr_library_names OVR)
+list(APPEND _ovr_library_names ovr${_ovr_libname_bitsuffix})
+list(APPEND _ovr_library_names OVRRT${_ovr_libname_bitsuffix})
+list(APPEND _ovr_library_names OVRRT${_ovr_libname_bitsuffix}_0)
+list(APPEND _ovr_library_debug_names ovr)
+list(APPEND _ovr_library_debug_names OVR)
+list(APPEND _ovr_library_debug_names ovr${_ovr_libname_bitsuffix}d)
+list(APPEND _ovr_library_debug_names OVR${_ovr_libname_bitsuffix}d)
+list(APPEND _ovr_library_debug_names OVRRT${_ovr_libname_bitsuffix})
+list(APPEND _ovr_library_debug_names OVRRT${_ovr_libname_bitsuffix}_0)
 
 find_library(OVR_LIBRARY_RELEASE
 	NAMES
-	ovr${_ovr_libname_bitsuffix}
-	libovr${_ovr_libname_bitsuffix}
+	${_ovr_library_names}
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
 	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
-	${OVR_LIBRARY_PATH_SUFFIX}
-	${OVR_LIBRARY_PATH_SUFFIX_START}/Release
-	${OVR_LIBRARY_PATH_SUFFIX_START}/Release/${_ovr_library_arch})
+	${_ovr_library_paths}
+)
 
 find_library(OVR_LIBRARY_DEBUG
 	NAMES
-	ovr${_ovr_libname_bitsuffix}d
-	libovr${_ovr_libname_bitsuffix}d
+	${_ovr_library_debug_names}
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
 	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
-	${OVR_LIBRARY_PATH_SUFFIX}
-	${OVR_LIBRARY_PATH_SUFFIX_START}/Debug
-	${OVR_LIBRARY_PATH_SUFFIX_START}/Debug/${_ovr_library_arch})
+	${_ovr_library_debug_paths}
+)
 
 include(SelectLibraryConfigurations)
 select_library_configurations(OVR)
@@ -132,11 +210,14 @@ find_path(OVR_INCLUDE_DIR
 	PATH_SUFFIXES
 	include
 	Include
-	)
+)
+
+# Some versions of Oculus SDK keep additional header files in a separate directory.
+# They keep changing the names of these files, too.
 
 find_path(OVR_SOURCE_DIR
 	NAMES
-	OVR_CAPI.h
+	OVR_CAPI.cpp
 	HINTS
 	"${_libdir}"
 	"${_libdir}/.."
@@ -146,7 +227,8 @@ find_path(OVR_SOURCE_DIR
 	"${OVR_ROOT_DIR}"
 	PATH_SUFFIXES
 	Src
-	)
+	Include
+)
 
 # Dependencies
 
@@ -203,7 +285,7 @@ find_package_handle_standard_args(OVR
 	OVR_INCLUDE_DIR
 	OVR_SOURCE_DIR
 	${_ovr_dependencies}
-	)
+)
 
 if(OVR_FOUND)
 	set(OVR_LIBRARIES ${OVR_LIBRARY} ${_ovr_dependency_libraries})

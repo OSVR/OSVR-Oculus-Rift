@@ -1,15 +1,15 @@
 /** @file
     @brief Header
 
-    @date 2014
+    @date 2015
 
     @author
-    Ryan Pavlik
-    <ryan@sensics.com>
+    Sensics, Inc.
     <http://sensics.com>
+
 */
 
-// Copyright 2014 Sensics, Inc.
+// Copyright 2015 Sensics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,8 +23,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef INCLUDED_VRPNMultiserver_h_GUID_05913DEF_7B12_4089_FE38_379BEF4A1A7D
-#define INCLUDED_VRPNMultiserver_h_GUID_05913DEF_7B12_4089_FE38_379BEF4A1A7D
+
+#ifndef INCLUDED_contains_h_GUID_AB217A8C_822E_40AC_B3AA_9BDEF9563EC0
+#define INCLUDED_contains_h_GUID_AB217A8C_822E_40AC_B3AA_9BDEF9563EC0
 
 // Internal Includes
 // - none
@@ -33,19 +34,19 @@
 // - none
 
 // Standard includes
-#include <map>
-#include <string>
+#include <algorithm>        // for std::find
+#include <iterator>         // for std::begin, std::end
 
-class VRPNMultiserverData {
-  public:
-    std::string getName(std::string const &nameStem);
+/**
+ * Searches a container for an element.
+ *
+ * @returns true if the element is in the countainer, false otherwise.
+ */
+template <typename T, typename E>
+bool contains(const T& container, const E& element)
+{
+    return (std::find(std::begin(container), std::end(container), element) != std::end(container));
+}
 
-  private:
-    typedef std::map<std::string, size_t> NameCountMap;
-    std::string assignName(std::string const &nameStem);
-    size_t assignNumber(std::string const &nameStem);
+#endif // INCLUDED_contains_h_GUID_AB217A8C_822E_40AC_B3AA_9BDEF9563EC0
 
-    NameCountMap m_nameCount;
-};
-
-#endif // INCLUDED_VRPNMultiserver_h_GUID_05913DEF_7B12_4089_FE38_379BEF4A1A7D

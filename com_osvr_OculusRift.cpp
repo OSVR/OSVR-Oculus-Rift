@@ -1,15 +1,15 @@
 /** @file
-    @brief Implementation of the "multiserver" plugin that offers the stock VRPN
+    @brief Oculus Rift driver for OSVR.
    devices.
 
-    @date 2014
+    @date 2015
 
     @author
     Kevin M. Godby
     <kevin@godby.org>
 */
 
-// Copyright 2014 Sensics, Inc.
+// Copyright 2015 Sensics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,25 +24,27 @@
 // limitations under the License.
 
 // Internal Includes
-#include "VRPNMultiserver.h"
-#include "DevicesWithParameters.h"
 #include <osvr/PluginKit/PluginKit.h>
-#include <osvr/VRPNServer/VRPNDeviceRegistration.h>
+#include "OculusRiftDetector.h"
+#include "OculusRiftManager.h"
 
 // Library/third-party includes
-#include "vrpn_Connection.h"
-#include "vrpn_Tracker_OculusRift.h"
-
-// Standard includes
 // - none
 
-OSVR_PLUGIN(com_osvr_bundled_Multiserver) {
-    osvr::pluginkit::PluginContext context(ctx);
+// Standard includes
+#include <memory>
+#include <iostream>  // for debugging
 
-    VRPNMultiserverData &data =
-        *context.registerObjectForDeletion(new VRPNMultiserverData);
-    osvrRegisterDriverInstantiationCallback(
-        ctx, "OculusRift", &wrappedConstructor<&createOculusRift>, &data);
+OSVR_PLUGIN(com_osvr_OculusRift) {
+    std::cout << "[OSVR Oculus Rift] OSVR_PLUGIN(com_osvr_OculusRift) called." << std::endl;
+
+    osvr::pluginkit::PluginContext context{ctx};
+
+    OculusRiftManager* oculus_rift_manager{new OculusRiftManager{}};
+    osvr::pluginkit::registerObjectForDeletion(ctx, oculus_rift_manager);
+
+    context.registerHardwareDetectCallback(new OculusRiftDetector{oculus_rift_manager});
 
     return OSVR_RETURN_SUCCESS;
 }
+
