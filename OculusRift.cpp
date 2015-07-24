@@ -27,6 +27,7 @@
 // Internal Includes
 #include "OculusRift.h"
 #include "osvr_compiler_detection.h"
+#include "ovr_version.h"
 
 // Library/third-party includes
 // - none
@@ -49,13 +50,21 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     osvrDeviceTrackerConfigure(opts, &leveledCameraTracker_);
 
     // Create the sync device token with the options
-    deviceToken_.initSync(ctx, "Oculus Rift", opts);
+    deviceToken_.initSync(ctx, "OculusRift", opts);
     deviceToken_.sendJsonDescriptor(getDisplayJson());
     deviceToken_.registerUpdateCallback(this);
 
     // Connect to HMD
-    //hmd_ = ovrHmd_Create(index); // old version
-	ovrResult result = ovrHmd_Create(index, &hmd_);
+#if OSVR_OVR_VERSION_LESS_THAN(0, 6, 0, 0)
+    hmd_ = ovrHmd_Create(index);
+#else
+    ovrResult result = ovrHmd_Create(index, &hmd_);
+    if (!OVR_SUCCESS(result)) {
+        ovrErrorInfo error_info;
+        ovr_GetLastErrorInfo(&error_info);
+        std::cerr << "[Oculus Rift] Error creating HMD handle: " << error_info.ErrorString << "." << std::endl;
+    }
+#endif
 }
 
 OculusRift::~OculusRift() OSVR_NOEXCEPT
