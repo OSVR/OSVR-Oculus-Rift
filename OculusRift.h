@@ -28,7 +28,7 @@
 #define INCLUDED_OculusRift_h_GUID_7157AB6B_88FC_44A6_8E1A_0686DF08FCBA
 
 // Internal Includes
-// - none
+#include "osvr_compiler_detection.h"    // for OSVR_NOTHROW
 
 // Library/third-party includes
 #include <osvr/PluginKit/TrackerInterfaceC.h>
@@ -43,7 +43,7 @@
 class OculusRift {
 public:
     OculusRift(OSVR_PluginRegContext ctx, int index = 0);
-    ~OculusRift() noexcept;
+    ~OculusRift() OSVR_NOEXCEPT;
     void destroy();
 
     std::string getProductName() const;

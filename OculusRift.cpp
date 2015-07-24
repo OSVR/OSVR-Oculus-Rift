@@ -26,6 +26,7 @@
 
 // Internal Includes
 #include "OculusRift.h"
+#include "osvr_compiler_detection.h"
 
 // Library/third-party includes
 // - none
@@ -36,7 +37,7 @@
 #include <sstream>
 #include <cmath>
 
-constexpr double OSVR_PI = 3.1415926535897932385;
+OSVR_CONSTEXPR double OSVR_PI = 3.1415926535897932385;
 
 OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 {
@@ -53,10 +54,11 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     deviceToken_.registerUpdateCallback(this);
 
     // Connect to HMD
-    hmd_ = ovrHmd_Create(index);
+    //hmd_ = ovrHmd_Create(index); // old version
+	ovrResult result = ovrHmd_Create(index, &hmd_);
 }
 
-OculusRift::~OculusRift() noexcept
+OculusRift::~OculusRift() OSVR_NOEXCEPT
 {
     std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
     ovrHmd_Destroy(hmd_);

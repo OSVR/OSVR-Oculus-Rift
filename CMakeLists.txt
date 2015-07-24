@@ -1,7 +1,7 @@
 #
 # Oculus Rift plugin for OSVR
 #
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.1.0)
 project(com_osvr_OculusRift)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -9,9 +9,24 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+#
+# Dependencies
+#
 find_package(osvr REQUIRED)
 find_package(OVR REQUIRED)
 find_package(jsoncpp REQUIRED)
+
+#
+# Detect available C++ language, library, and compiler features
+#
+include(WriteCompilerDetectionHeader)
+write_compiler_detection_header(
+	FILE "osvr_compiler_detection.h"
+	PREFIX OSVR
+	COMPILERS GNU Clang AppleClang MSVC
+	FEATURES cxx_override cxx_noexcept cxx_constexpr
+)
+
 
 osvr_add_plugin(com_osvr_OculusRift
 	OculusRift.cpp
