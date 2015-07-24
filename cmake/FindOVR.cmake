@@ -158,11 +158,13 @@ list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_a
 list(APPEND _ovr_library_names libovr.ax${_ovr_libname_bitsuffix})
 list(APPEND _ovr_library_names ovr)
 list(APPEND _ovr_library_names OVR)
+list(APPEND _ovr_library_names LibOVR)
 list(APPEND _ovr_library_names ovr${_ovr_libname_bitsuffix})
 list(APPEND _ovr_library_names OVRRT${_ovr_libname_bitsuffix})
 list(APPEND _ovr_library_names OVRRT${_ovr_libname_bitsuffix}_0)
 list(APPEND _ovr_library_debug_names ovr)
 list(APPEND _ovr_library_debug_names OVR)
+list(APPEND _ovr_library_debug_names LibOVR)
 list(APPEND _ovr_library_debug_names ovr${_ovr_libname_bitsuffix}d)
 list(APPEND _ovr_library_debug_names OVR${_ovr_libname_bitsuffix}d)
 list(APPEND _ovr_library_debug_names OVRRT${_ovr_libname_bitsuffix})
@@ -217,7 +219,7 @@ find_path(OVR_INCLUDE_DIR
 
 find_path(OVR_SOURCE_DIR
 	NAMES
-	OVR_CAPI.cpp
+	OVR_CAPI.h
 	HINTS
 	"${_libdir}"
 	"${_libdir}/.."
