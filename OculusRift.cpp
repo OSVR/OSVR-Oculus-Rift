@@ -28,6 +28,7 @@
 #include "OculusRift.h"
 #include "osvr_compiler_detection.h"
 #include "ovr_version.h"
+#include "OculusRiftException.h"
 
 // Library/third-party includes
 // - none
@@ -44,6 +45,20 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 {
     std::cout << "[Oculus Rift] Creating Oculus Rift..." << std::endl;
 
+	// Connect to HMD
+#if OSVR_OVR_VERSION_LESS_THAN(0, 6, 0, 0)
+	hmd_ = ovrHmd_Create(index);
+	// TODO handle errors
+#else
+	ovrResult result = ovrHmd_Create(index, &hmd_);
+	if (!OVR_SUCCESS(result)) {
+		ovrErrorInfo error_info;
+		ovr_GetLastErrorInfo(&error_info);
+		std::cerr << "[Oculus Rift] Error creating HMD handle: " << error_info.ErrorString << "." << std::endl;
+		throw OculusRiftException("Error creating HMD handle: " + std::string(error_info.ErrorString) + ".");
+	}
+#endif
+
     OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
     osvrDeviceTrackerConfigure(opts, &hmdTracker_);
     osvrDeviceTrackerConfigure(opts, &cameraTracker_);
@@ -53,28 +68,16 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     deviceToken_.initSync(ctx, "OculusRift", opts);
     deviceToken_.sendJsonDescriptor(getDisplayJson());
     deviceToken_.registerUpdateCallback(this);
-
-    // Connect to HMD
-#if OSVR_OVR_VERSION_LESS_THAN(0, 6, 0, 0)
-    hmd_ = ovrHmd_Create(index);
-#else
-    ovrResult result = ovrHmd_Create(index, &hmd_);
-    if (!OVR_SUCCESS(result)) {
-        ovrErrorInfo error_info;
-        ovr_GetLastErrorInfo(&error_info);
-        std::cerr << "[Oculus Rift] Error creating HMD handle: " << error_info.ErrorString << "." << std::endl;
-    }
-#endif
 }
 
 OculusRift::~OculusRift() OSVR_NOEXCEPT
 {
-    std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
-    ovrHmd_Destroy(hmd_);
+    //ovrHmd_Destroy(hmd_);
 }
 
 void OculusRift::destroy()
 {
+	std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
     ovrHmd_Destroy(hmd_);
 }
 

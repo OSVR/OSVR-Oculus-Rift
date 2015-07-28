@@ -62,7 +62,7 @@ public:
     void deregisterDisconnected(const std::vector<std::string>& serial_numbers);
 
 private:
-    bool initialized_{false};
+	bool initialized_{false};
     std::vector<std::unique_ptr<OculusRift>> oculusRifts_{};
 };
 
@@ -96,12 +96,15 @@ inline bool OculusRiftManager::initialize()
         0                       // ConnectionTimeoutSeconds
     };
 
-    initialized_ = ovr_Initialize(&params);
+    ovrResult result = ovr_Initialize(&params);
+	initialized_ = OVR_SUCCESS(result);
     //initialized_ = ovr_Initialize();
-    if (!initialized_) {
-        std::cerr << "[OSVR Oculus Rift] Error initializing Oculus Rift." << std::endl;
+    if (initialized_) {
+		std::cout << "[OSVR Oculus Rift] Oculus Rift initialized." << std::endl;
     } else {
-        std::cout << "[OSVR Oculus Rift] Oculus Rift initialized." << std::endl;
+		ovrErrorInfo error_info;
+		ovr_GetLastErrorInfo(&error_info);
+		std::cerr << "[OSVR Oculus Rift] Error initializing Oculus Rift system: " << error_info.ErrorString << "." << std::endl;
     }
 
     return initialized_;
