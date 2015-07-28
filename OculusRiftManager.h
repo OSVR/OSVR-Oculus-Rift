@@ -30,6 +30,7 @@
 // Internal Includes
 #include "OculusRift.h"
 #include "contains.h"
+#include "ovr_version.h"
 
 // Library/third-party includes
 #include <OVR_CAPI.h>
@@ -85,26 +86,41 @@ inline bool OculusRiftManager::initialize()
 {
     std::cout << "[OSVR Oculus Rift] Initializing Oculus API..." << std::endl;
 
-    //typedef void (OVR_CDECL *ovrLogCallback)(int level, const char* message);
-    //ovrLogCallback LogCallback;
-
-    //ovrInitParams* params = new ovrInitParams();
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
     ovrInitParams params = {
         ovrInit_Debug | ovrInit_RequestVersion, // Flags
         OVR_MINOR_VERSION,      // RequestedMinorVersion
         ovr_log_callback,       // LogCallback
         0                       // ConnectionTimeoutSeconds
     };
+#endif
 
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
     ovrResult result = ovr_Initialize(&params);
-	initialized_ = OVR_SUCCESS(result);
-    //initialized_ = ovr_Initialize();
+    initialized_ = OVR_SUCCESS(ovrResult);
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
+    ovrBool result = ovr_Initialize(&params);
+    initialized_ = static_cast<bool>(result);
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,4,4,0)
+    ovrBool result = ovr_Initialize();
+    initialized_ = static_cast<bool>(result);
+#else
+#error "Unsupported version of Oculus VR SDK. Please upgrade."
+#endif
+
     if (initialized_) {
-		std::cout << "[OSVR Oculus Rift] Oculus Rift initialized." << std::endl;
+        std::cout << "[OSVR Oculus Rift] Oculus Rift initialized." << std::endl;
     } else {
-		ovrErrorInfo error_info;
-		ovr_GetLastErrorInfo(&error_info);
-		std::cerr << "[OSVR Oculus Rift] Error initializing Oculus Rift system: " << error_info.ErrorString << "." << std::endl;
+        std::string ovr_error_msg = "[OSVR Oculus Rift] Error initializing Oculus Rift system";
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
+        ovrErrorInfo error_info;
+        ovr_GetLastErrorInfo(&error_info);
+        evr_error_msg += std::string(": ") + error_info.ErrorString;
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
+        const char* msg = ovrHmd_GetLastError(nullptr);
+        ovr_error_msg += std::string(": ") + msg;
+#endif
+        std::cerr << ovr_error_msg << "." << std::endl;
     }
 
     return initialized_;

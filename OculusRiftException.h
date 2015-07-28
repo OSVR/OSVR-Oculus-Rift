@@ -39,18 +39,18 @@ Sensics, Inc.
 
 class OculusRiftException : public std::exception {
 public:
-	OculusRiftException(const std::string& msg) OSVR_NOEXCEPT : std::exception(), message_(msg)
-	{
-		// do nothing
-	}
+    OculusRiftException(const std::string& msg) OSVR_NOEXCEPT : std::exception(), message_(msg)
+    {
+        // do nothing
+    }
 
-	virtual const char* what() const OSVR_OVERRIDE
-	{
-		return message_.c_str();
-	}
+    virtual const char* what() const OSVR_NOEXCEPT OSVR_OVERRIDE
+    {
+        return message_.c_str();
+    }
 
 private:
-	const std::string message_;
+    const std::string message_;
 };
 
 #endif // INCLUDED_OculusRiftException_h_GUID_AF7C1708_4C46_42CA_B6F4_70E5644CFC63

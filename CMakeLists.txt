@@ -29,11 +29,12 @@ write_compiler_detection_header(
 
 
 osvr_add_plugin(com_osvr_OculusRift
-	OculusRift.cpp
 	com_osvr_OculusRift.cpp
+	OculusRift.cpp
 	contains.h
-	OculusRift.h
 	OculusRiftDetector.h
+	OculusRiftException.h
+	OculusRift.h
 	OculusRiftManager.h
 	ovr_version.h
 )
