@@ -155,24 +155,28 @@ list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating
 list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
 
 # Generate list of potential library names
-list(APPEND _ovr_library_names libovr.ax${_ovr_libname_bitsuffix})
-list(APPEND _ovr_library_names ovr)
-list(APPEND _ovr_library_names OVR)
-list(APPEND _ovr_library_names LibOVR)
-list(APPEND _ovr_library_names ovr${_ovr_libname_bitsuffix})
-list(APPEND _ovr_library_names OVRRT${_ovr_libname_bitsuffix})
-list(APPEND _ovr_library_names OVRRT${_ovr_libname_bitsuffix}_0)
-list(APPEND _ovr_library_debug_names ovr)
-list(APPEND _ovr_library_debug_names OVR)
-list(APPEND _ovr_library_debug_names LibOVR)
-list(APPEND _ovr_library_debug_names ovr${_ovr_libname_bitsuffix}d)
-list(APPEND _ovr_library_debug_names OVR${_ovr_libname_bitsuffix}d)
-list(APPEND _ovr_library_debug_names OVRRT${_ovr_libname_bitsuffix})
-list(APPEND _ovr_library_debug_names OVRRT${_ovr_libname_bitsuffix}_0)
+list(APPEND _ovr_dynamic_library_names OVRRT${_ovr_libname_bitsuffix})
+list(APPEND _ovr_dynamic_library_names OVRRT${_ovr_libname_bitsuffix}_0)
+list(APPEND _ovr_dynamic_library_names libOVRRT${_ovr_libname_bitsuffix}.so.5)
+list(APPEND _ovr_dynamic_library_names libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
+list(APPEND _ovr_static_library_names libovr.ax${_ovr_libname_bitsuffix})
+list(APPEND _ovr_static_library_names ovr)
+list(APPEND _ovr_static_library_names OVR)
+list(APPEND _ovr_static_library_names LibOVR)
+list(APPEND _ovr_static_library_names ovr${_ovr_libname_bitsuffix})
+list(APPEND _ovr_dynamic_library_debug_names OVRRT${_ovr_libname_bitsuffix})
+list(APPEND _ovr_dynamic_library_debug_names OVRRT${_ovr_libname_bitsuffix}_0)
+list(APPEND _ovr_dynamic_library_debug_names libOVRRT${_ovr_libname_bitsuffix}.so.5)
+list(APPEND _ovr_dynamic_library_debug_names libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
+list(APPEND _ovr_static_library_debug_names ovr)
+list(APPEND _ovr_static_library_debug_names OVR)
+list(APPEND _ovr_static_library_debug_names LibOVR)
+list(APPEND _ovr_static_library_debug_names ovr${_ovr_libname_bitsuffix}d)
+list(APPEND _ovr_static_library_debug_names OVR${_ovr_libname_bitsuffix}d)
 
-find_library(OVR_LIBRARY_RELEASE
+find_library(OVR_DYNAMIC_LIBRARY_RELEASE
 	NAMES
-	${_ovr_library_names}
+	${_ovr_dynamic_library_names}
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
@@ -181,9 +185,9 @@ find_library(OVR_LIBRARY_RELEASE
 	${_ovr_library_paths}
 )
 
-find_library(OVR_LIBRARY_DEBUG
+find_library(OVR_DYNAMIC_LIBRARY_DEBUG
 	NAMES
-	${_ovr_library_debug_names}
+	${_ovr_dynamic_library_debug_names}
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
@@ -192,11 +196,44 @@ find_library(OVR_LIBRARY_DEBUG
 	${_ovr_library_debug_paths}
 )
 
+find_library(OVR_STATIC_LIBRARY_RELEASE
+	NAMES
+	${_ovr_static_library_names}
+	PATHS
+	"${OVR_ROOT_DIR}"
+	"${OVR_ROOT_DIR}/LibOVR"
+	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
+	PATH_SUFFIXES
+	${_ovr_library_paths}
+)
+
+find_library(OVR_STATIC_LIBRARY_DEBUG
+	NAMES
+	${_ovr_static_library_debug_names}
+	PATHS
+	"${OVR_ROOT_DIR}"
+	"${OVR_ROOT_DIR}/LibOVR"
+	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
+	PATH_SUFFIXES
+	${_ovr_library_debug_paths}
+)
+
+# Prefer dynamic libraries over static libraries
+foreach(_config DEBUG RELEASE)
+    if(OVR_DYNAMIC_LIBRARY_${_config})
+        set(OVR_LIBRARY_${_config} ${OVR_DYNAMIC_LIBRARY_${_config}})
+    else()
+        set(OVR_LIBRARY_${_config} ${OVR_STATIC_LIBRARY_${_config}})
+    endif()
+endforeach()
+
 include(SelectLibraryConfigurations)
 select_library_configurations(OVR)
 
-if(OVR_LIBRARY_RELEASE)
-	get_filename_component(_libdir "${OVR_LIBRARY_RELEASE}" PATH)
+if(OVR_DYNAMIC_LIBRARY_RELEASE)
+    get_filename_component(_libdir "${OVR_DYNAMIC_LIBRARY_RELEASE}" PATH)
+elseif(OVR_STATIC_LIBRARY_RELEASE)
+    get_filename_component(_libdir "${OVR_STATIC_LIBRARY_RELEASE}" PATH)
 endif()
 
 find_path(OVR_INCLUDE_DIR

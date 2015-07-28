@@ -27,6 +27,11 @@ write_compiler_detection_header(
 	FEATURES cxx_override cxx_noexcept cxx_constexpr
 )
 
+include(CheckCXXSourceCompiles)
+set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_CXX11_STANDARD_COMPILE_OPTION})
+check_cxx_source_compiles("#include <memory>\nint main(int, char**) { std::unique_ptr<int> i = std::make_unique<int>(0); }" OSVR_HAS_STD_MAKE_UNIQUE)
+configure_file(osvr_compiler_tests.h.in "${CMAKE_CURRENT_BINARY_DIR}/osvr_compiler_tests.h")
+
 
 osvr_add_plugin(com_osvr_OculusRift
 	com_osvr_OculusRift.cpp

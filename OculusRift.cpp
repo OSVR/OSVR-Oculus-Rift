@@ -31,7 +31,7 @@
 #include "OculusRiftException.h"
 
 // Library/third-party includes
-// - none
+#include <json/json.h>
 
 // Standard includes
 #include <string>
@@ -63,14 +63,24 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     }
 #endif
 
+    // Initialize tracking and sensor fusion
+    const unsigned int supported_tracking_capabilities = ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position; // the tracking capabilities this driver will report
+    const unsigned int required_tracking_capabilities = 0; // the tracking capabilities which must be supported by the HMD
+    const ovrBool tracking_configured = ovrHmd_ConfigureTracking(hmd_, supported_tracking_capabilities, required_tracking_capabilities);
+    // returns FALSE if the required tracking capabilities are not supported (e.g., camera isn't plugged in)
+
+    detectTrackers();
+
+    std::cout << getDisplayJson();
+
     OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
-    osvrDeviceTrackerConfigure(opts, &hmdTracker_);
-    osvrDeviceTrackerConfigure(opts, &cameraTracker_);
-    osvrDeviceTrackerConfigure(opts, &leveledCameraTracker_);
+    osvrDeviceTrackerConfigure(opts, &tracker_);
+    osvrDeviceAnalogConfigure(opts, &analog_, static_cast<OSVR_ChannelCount>(AnalogChannels::NUM_CHANNELS));
 
     // Create the sync device token with the options
-    deviceToken_.initSync(ctx, "OculusRift", opts);
-    deviceToken_.sendJsonDescriptor(getDisplayJson());
+    std::string device_name = "OculusRift" + std::to_string(index);
+    deviceToken_.initSync(ctx, device_name.c_str(), opts);
+    deviceToken_.sendJsonDescriptor(getDeviceDescriptorJson());
     deviceToken_.registerUpdateCallback(this);
 }
 
@@ -81,7 +91,7 @@ OculusRift::~OculusRift() OSVR_NOEXCEPT
 
 void OculusRift::destroy()
 {
-	std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
+    std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
     ovrHmd_Destroy(hmd_);
 }
 
@@ -103,6 +113,68 @@ std::string OculusRift::getSerialNumber() const
 std::string OculusRift::getFirmwareVersion() const
 {
     return std::to_string(hmd_->FirmwareMajor) + "." + std::to_string(hmd_->FirmwareMinor);
+}
+
+unsigned int OculusRift::detectTrackers()
+{
+    int num_trackers = 0;
+
+    const ovrTrackingState ts = ovrHmd_GetTrackingState(hmd_, ovr_GetTimeInSeconds());
+
+    // Can we track the HMD?
+    if (ts.StatusFlags & ovrStatus_OrientationTracked) {
+        num_trackers++;
+    }
+
+    // Can we track the camera?
+    if (ts.StatusFlags & ovrStatus_CameraPoseTracked) {
+        num_trackers += 2; // first for camera, second for leveled camera
+    }
+
+    numTrackers_ = num_trackers;
+
+    return numTrackers_;
+}
+
+unsigned int OculusRift::getTrackerCount() const
+{
+    return numTrackers_;
+}
+
+std::string OculusRift::getDeviceDescriptorJson() const
+{
+    Json::Value root;
+    root["deviceVender"] = getManufacturer();
+    root["deviceName"] = getProductName();
+    root["author"] = "Kevin M. Godby <kevin@godby.org>";
+    root["version"] = 1;
+    root["lastModified"] = "2015-06-14T20:42:13Z";
+    root["interfaces"]["tracker"]["count"] = getTrackerCount();
+    root["interfaces"]["tracker"]["position"] = true; // FIXME
+    root["interfaces"]["tracker"]["orientation"] = true; // FIXME
+    root["interfaces"]["analog"]["count"] = 10; // FIXME
+    //root["interfaces"]["analog"]["traits"] = {}; // FIXME
+    root["semantic"]["hmd"]["$target"] = "tracker/0";
+    root["semantic"]["hmd"]["accelerometer"]["x"] = "analog/0";
+    root["semantic"]["hmd"]["accelerometer"]["y"] = "analog/1";
+    root["semantic"]["hmd"]["accelerometer"]["z"] = "analog/2";
+    root["semantic"]["hmd"]["gyroscope"]["x"] = "analog/3";
+    root["semantic"]["hmd"]["gyroscope"]["y"] = "analog/4";
+    root["semantic"]["hmd"]["gyroscope"]["z"] = "analog/5";
+    root["semantic"]["hmd"]["magnetometer"]["x"] = "analog/6";
+    root["semantic"]["hmd"]["magnetometer"]["y"] = "analog/7";
+    root["semantic"]["hmd"]["magnetometer"]["z"] = "analog/8";
+    root["semantic"]["hmd"]["temperature"] = "analog/9";
+    root["semantic"]["camera"]["$target"] = "tracker/1";
+    root["semantic"]["leveled_camera"]["$target"] = "tracker/2";
+    root["automaticAliases"]["/me/head"] = "semantic/hmd";
+
+    std::ostringstream ostr;
+    ostr << root;
+
+    std::cout << root;
+
+    return ostr.str();
 }
 
 std::string OculusRift::getDisplayJson() const
@@ -133,42 +205,26 @@ std::string OculusRift::getDisplayJson() const
     const double center_proj_y = 0.5; // TODO
     const bool rotate_180 = false; // TODO
 
-    std::ostringstream ostr;
-    ostr << "{\n";
-    ostr << "\t\"hmd\": {\n";
-    ostr << "\t\t\"field_of_view\": {\n";
-    ostr << "\t\t\t\"monocular_horizontal\": " << monocular_horizontal << ",\n";
-    ostr << "\t\t\t\"monocular_vertical\": " << monocular_vertical << ",\n";
-    ostr << "\t\t\t\"overlap_percent\": " << overlap_percent << ",\n";
-    ostr << "\t\t\t\"pitch_tilt\": " << pitch_tilt << ",\n";
-    ostr << "\t\t}\n";
-    ostr << "\t\t\"resolutions\": [\n";
-    ostr << "\t\t\t{\n";
-    ostr << "\t\t\t\t\"width\": " << width << ",\n";
-    ostr << "\t\t\t\t\"height\": " << height << ",\n";
-    ostr << "\t\t\t\t\"video_inputs\": " << video_inputs << ",\n";
-    ostr << "\t\t\t\t\"display_mode\": \"" << display_mode << "\",\n";
-    ostr << "\t\t\t}\n";
-    ostr << "\t\t],\n";
-    ostr << "\t\t\"distortion\": {\n";
-    ostr << "\t\t\t\"k1_red\": " << k1_red << ",\n";
-    ostr << "\t\t\t\"k1_green\": " << k1_green << ",\n";
-    ostr << "\t\t\t\"k1_blue\": " << k1_blue << ",\n";
-    ostr << "\t\t},\n";
-    ostr << "\t\t\"rendering\": {\n";
-    ostr << "\t\t\t\"right_roll\": " << right_roll << ",\n";
-    ostr << "\t\t\t\"left_roll\": " << left_roll << "\n";
-    ostr << "\t\t},\n";
-    ostr << "\t\t\"eyes\": [\n";
-    ostr << "\t\t\t{\n";
-    ostr << "\t\t\t\t\"center_proj_x\": " << center_proj_x << ",\n";
-    ostr << "\t\t\t\t\"center_proj_y\": " << center_proj_x << ",\n";
-    ostr << "\t\t\t\t\"rotate_180\": " << rotate_180 << "\n";
-    ostr << "\t\t\t}\n";
-    ostr << "\t\t],\n";
-    ostr << "\t}\n";
-    ostr << "}\n";
+    Json::Value root;
+    root["hmd"]["field_of_view"]["monocular_horizontal"] = monocular_horizontal;
+    root["hmd"]["field_of_view"]["monocular_vertical"] = monocular_vertical;
+    root["hmd"]["field_of_view"]["overlap_percent"] = overlap_percent;
+    root["hmd"]["field_of_view"]["pitch_tilt"] = pitch_tilt;
+    root["hmd"]["resolutions"][0]["width"] = width;
+    root["hmd"]["resolutions"][0]["height"] = height;
+    root["hmd"]["resolutions"][0]["video_inputs"] = video_inputs;
+    root["hmd"]["resolutions"][0]["display_mode"] = display_mode;
+    root["hmd"]["distortion"]["k1_red"] = k1_red;
+    root["hmd"]["distortion"]["k1_blue"] = k1_blue;
+    root["hmd"]["distortion"]["k1_green"] = k1_green;
+    root["hmd"]["rendering"]["right_roll"] = right_roll;
+    root["hmd"]["rendering"]["left_roll"] = left_roll;
+    root["hmd"]["eyes"][0]["center_proj_x"] = center_proj_x;
+    root["hmd"]["eyes"][0]["center_proj_y"] = center_proj_y;
+    root["hmd"]["eyes"][0]["rotate_180"] = rotate_180;
 
+    std::ostringstream ostr;
+    ostr << root;
     return ostr.str();
 }
 
@@ -205,6 +261,106 @@ double OculusRift::getMonocularVerticalFovDegrees() const
 
 OSVR_ReturnCode OculusRift::update()
 {
+    std::cout << "[Oculus Rift] Updating tracker and analog values!" << std::endl;
+
+    // Poll tracking data
+    const ovrTrackingState ts = ovrHmd_GetTrackingState(hmd_, ovr_GetTimeInSeconds());
+
+    if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
+        // Both orientation and position are known
+        std::cout << "[Oculus Rift] Supports orientation and position tracking." << std::endl;
+
+        const ovrPoseStatef head_state = ts.HeadPose;
+        const ovrPosef head_pose = head_state.ThePose;
+
+        OSVR_Pose3 hmd_pose;
+        hmd_pose.translation.data[0] = head_pose.Position.x;
+        hmd_pose.translation.data[1] = head_pose.Position.y;
+        hmd_pose.translation.data[2] = head_pose.Position.z;
+        hmd_pose.rotation.data[0] = head_pose.Orientation.w;
+        hmd_pose.rotation.data[1] = head_pose.Orientation.x;
+        hmd_pose.rotation.data[2] = head_pose.Orientation.y;
+        hmd_pose.rotation.data[3] = head_pose.Orientation.z;
+
+        osvrDeviceTrackerSendPose(deviceToken_, tracker_, &hmd_pose, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
+    } else if (ts.StatusFlags & (ovrStatus_OrientationTracked)) {
+        // Only the orientation is known
+        std::cout << "[Oculus Rift] Supports orientation tracking only." << std::endl;
+
+        const ovrPoseStatef head_state = ts.HeadPose;
+        const ovrPosef head_pose = head_state.ThePose;
+
+        OSVR_OrientationState hmd_orientation;
+        hmd_orientation.data[0] = head_pose.Orientation.w;
+        hmd_orientation.data[1] = head_pose.Orientation.x;
+        hmd_orientation.data[2] = head_pose.Orientation.y;
+        hmd_orientation.data[3] = head_pose.Orientation.z;
+
+        osvrDeviceTrackerSendOrientation(deviceToken_, tracker_, &hmd_orientation, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
+    } else if (ts.StatusFlags & (ovrStatus_PositionTracked)) {
+        // Only the position is known
+        std::cout << "[Oculus Rift] Supports position tracking only." << std::endl;
+
+        const ovrPoseStatef head_state = ts.HeadPose;
+        const ovrPosef head_pose = head_state.ThePose;
+
+        OSVR_PositionState hmd_position;
+        hmd_position.data[0] = head_pose.Position.x;
+        hmd_position.data[1] = head_pose.Position.y;
+        hmd_position.data[2] = head_pose.Position.z;
+
+        osvrDeviceTrackerSendPosition(deviceToken_, tracker_, &hmd_position, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
+    }
+
+    if (ts.StatusFlags & (ovrStatus_CameraPoseTracked)) {
+        std::cout << "[Oculus Rift] Supports camera pose tracking." << std::endl;
+
+        OSVR_Pose3 camera_pose;
+        camera_pose.translation.data[0] = ts.CameraPose.Position.x;
+        camera_pose.translation.data[1] = ts.CameraPose.Position.y;
+        camera_pose.translation.data[2] = ts.CameraPose.Position.z;
+        camera_pose.rotation.data[0] = ts.CameraPose.Orientation.w;
+        camera_pose.rotation.data[1] = ts.CameraPose.Orientation.x;
+        camera_pose.rotation.data[2] = ts.CameraPose.Orientation.y;
+        camera_pose.rotation.data[3] = ts.CameraPose.Orientation.z;
+        osvrDeviceTrackerSendPose(deviceToken_, tracker_, &camera_pose, static_cast<OSVR_ChannelCount>(TrackerChannels::CAMERA));
+
+        OSVR_Pose3 leveled_camera_pose;
+        leveled_camera_pose.translation.data[0] = ts.LeveledCameraPose.Position.x;
+        leveled_camera_pose.translation.data[1] = ts.LeveledCameraPose.Position.y;
+        leveled_camera_pose.translation.data[2] = ts.LeveledCameraPose.Position.z;
+        leveled_camera_pose.rotation.data[0] = ts.LeveledCameraPose.Orientation.w;
+        leveled_camera_pose.rotation.data[1] = ts.LeveledCameraPose.Orientation.x;
+        leveled_camera_pose.rotation.data[2] = ts.LeveledCameraPose.Orientation.y;
+        leveled_camera_pose.rotation.data[3] = ts.LeveledCameraPose.Orientation.z;
+        osvrDeviceTrackerSendPose(deviceToken_, tracker_, &leveled_camera_pose, static_cast<OSVR_ChannelCount>(TrackerChannels::LEVELED_CAMERA));
+    }
+
+    // Now for the analog interfaces
+    const ovrSensorData sensor_data = ts.RawSensorData;
+
+    // Acceleration reading (x, y, z) in m/s^2
+    const ovrVector3f accelerometer = sensor_data.Accelerometer;
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, accelerometer.x, static_cast<OSVR_ChannelCount>(AnalogChannels::ACCELEROMETER_X));
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, accelerometer.y, static_cast<OSVR_ChannelCount>(AnalogChannels::ACCELEROMETER_Y));
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, accelerometer.z, static_cast<OSVR_ChannelCount>(AnalogChannels::ACCELEROMETER_Z));
+
+    // Rotation rate (x, y, z) in rad/s
+    const ovrVector3f gyro = sensor_data.Gyro;
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, gyro.x, static_cast<OSVR_ChannelCount>(AnalogChannels::GYROSCOPE_X));
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, gyro.y, static_cast<OSVR_ChannelCount>(AnalogChannels::GYROSCOPE_Y));
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, gyro.z, static_cast<OSVR_ChannelCount>(AnalogChannels::GYROSCOPE_Z));
+
+    // Magnetic field (x, y, z) in Gauss
+    const ovrVector3f magnetometer = sensor_data.Magnetometer;
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, magnetometer.x, static_cast<OSVR_ChannelCount>(AnalogChannels::MAGNETOMETER_X));
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, magnetometer.y, static_cast<OSVR_ChannelCount>(AnalogChannels::MAGNETOMETER_Y));
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, magnetometer.z, static_cast<OSVR_ChannelCount>(AnalogChannels::MAGNETOMETER_Z));
+
+    // Temperature of sensor in degrees Celsius
+    const float temperature = sensor_data.Temperature;
+    osvrDeviceAnalogSetValue(deviceToken_, analog_, temperature, static_cast<OSVR_ChannelCount>(AnalogChannels::TEMPERATURE));
+
     return OSVR_RETURN_SUCCESS;
 }
 

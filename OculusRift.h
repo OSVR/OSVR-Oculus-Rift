@@ -51,6 +51,10 @@ public:
     std::string getSerialNumber() const;
     std::string getFirmwareVersion() const;
 
+    unsigned int detectTrackers();
+    unsigned int getTrackerCount() const;
+
+    std::string getDeviceDescriptorJson() const;
     std::string getDisplayJson() const;
 
     OSVR_ReturnCode update();
@@ -58,10 +62,30 @@ public:
 private:
     ovrHmd hmd_{nullptr};
     osvr::pluginkit::DeviceToken deviceToken_;
-    OSVR_TrackerDeviceInterface hmdTracker_;
-    OSVR_TrackerDeviceInterface cameraTracker_;
-    OSVR_TrackerDeviceInterface leveledCameraTracker_;
-    OSVR_AnalogDeviceInterface accelerometer_;
+    OSVR_TrackerDeviceInterface tracker_;
+    OSVR_AnalogDeviceInterface analog_;
+    int numTrackers_ = 0;
+
+    enum class TrackerChannels {
+        HMD,
+        CAMERA,
+        LEVELED_CAMERA,
+        NUM_CHANNELS
+    };
+
+    enum class AnalogChannels {
+        ACCELEROMETER_X,
+        ACCELEROMETER_Y,
+        ACCELEROMETER_Z,
+        GYROSCOPE_X,
+        GYROSCOPE_Y,
+        GYROSCOPE_Z,
+        MAGNETOMETER_X,
+        MAGNETOMETER_Y,
+        MAGNETOMETER_Z,
+        TEMPERATURE,
+        NUM_CHANNELS
+    };
 
     double getMonocularHorizontalFovDegrees() const;
     double getMonocularVerticalFovDegrees() const;

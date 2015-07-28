@@ -31,6 +31,7 @@
 #include "OculusRift.h"
 #include "contains.h"
 #include "ovr_version.h"
+#include "make_unique.h"
 
 // Library/third-party includes
 #include <OVR_CAPI.h>
@@ -63,7 +64,7 @@ public:
     void deregisterDisconnected(const std::vector<std::string>& serial_numbers);
 
 private:
-	bool initialized_{false};
+    bool initialized_{false};
     std::vector<std::unique_ptr<OculusRift>> oculusRifts_{};
 };
 
@@ -156,7 +157,8 @@ inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
     // Iterate over all the detected HMDs, constructing newly attached HMDs and
     // removing detached HMDs.
     for (int index = 0; index < num_hmds_detected; ++index) {
-        std::unique_ptr<OculusRift> hmd {new OculusRift{ctx, index}};
+        //std::unique_ptr<OculusRift> hmd {new OculusRift{ctx, index}};
+        auto hmd = std::make_unique<OculusRift>(ctx, index);
 
         // Retrieve the serial number of the HMD.  We'll compare it against our
         // list to add and remove newly attached or detached HMDs.
