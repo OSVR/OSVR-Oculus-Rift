@@ -120,16 +120,16 @@ endif()
 
 # Test 32/64 bits
 if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+	set(_ovr_libname_bitsuffix "64")
 	set(_ovr_library_arch "x86_64")
 	if (WIN32)
 		set(_ovr_library_arch "x64")
-		set(_ovr_libname_bitsuffix "64")
 	endif(WIN32)
 else()
+	set(_ovr_libname_bitsuffix "32")
 	set(_ovr_library_arch "i386")
 	if (WIN32)
 		set(_ovr_library_arch "Win32")
-		set(_ovr_libname_bitsuffix "")
 	endif(WIN32)
 endif()
 
@@ -160,6 +160,7 @@ list(APPEND _ovr_dynamic_library_names OVRRT${_ovr_libname_bitsuffix}_0)
 list(APPEND _ovr_dynamic_library_names libOVRRT${_ovr_libname_bitsuffix}.so.5)
 list(APPEND _ovr_dynamic_library_names libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
 list(APPEND _ovr_static_library_names libovr.ax${_ovr_libname_bitsuffix})
+list(APPEND _ovr_static_library_names libovr.a)
 list(APPEND _ovr_static_library_names ovr)
 list(APPEND _ovr_static_library_names OVR)
 list(APPEND _ovr_static_library_names LibOVR)
@@ -168,6 +169,7 @@ list(APPEND _ovr_dynamic_library_debug_names OVRRT${_ovr_libname_bitsuffix})
 list(APPEND _ovr_dynamic_library_debug_names OVRRT${_ovr_libname_bitsuffix}_0)
 list(APPEND _ovr_dynamic_library_debug_names libOVRRT${_ovr_libname_bitsuffix}.so.5)
 list(APPEND _ovr_dynamic_library_debug_names libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
+list(APPEND _ovr_static_library_debug_names libovr.a)
 list(APPEND _ovr_static_library_debug_names ovr)
 list(APPEND _ovr_static_library_debug_names OVR)
 list(APPEND _ovr_static_library_debug_names LibOVR)
@@ -183,6 +185,8 @@ find_library(OVR_DYNAMIC_LIBRARY_RELEASE
 	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_paths}
+	lib
+	lib64
 )
 
 find_library(OVR_DYNAMIC_LIBRARY_DEBUG
@@ -194,6 +198,8 @@ find_library(OVR_DYNAMIC_LIBRARY_DEBUG
 	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_debug_paths}
+	lib
+	lib64
 )
 
 find_library(OVR_STATIC_LIBRARY_RELEASE
@@ -205,6 +211,8 @@ find_library(OVR_STATIC_LIBRARY_RELEASE
 	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_paths}
+	lib
+	lib64
 )
 
 find_library(OVR_STATIC_LIBRARY_DEBUG
@@ -216,6 +224,8 @@ find_library(OVR_STATIC_LIBRARY_DEBUG
 	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_debug_paths}
+	lib
+	lib64
 )
 
 # Prefer dynamic libraries over static libraries
@@ -267,6 +277,7 @@ find_path(OVR_SOURCE_DIR
 	PATH_SUFFIXES
 	Src
 	Include
+	include
 )
 
 # Dependencies
@@ -327,7 +338,7 @@ find_package_handle_standard_args(OVR
 )
 
 if(OVR_FOUND)
-	set(OVR_LIBRARIES ${OVR_LIBRARY} ${_ovr_dependency_libraries})
+	set(OVR_LIBRARIES ${OVR_LIBRARY} ${_ovr_dependency_libraries} ${CMAKE_DL_LIBS})
 	set(OVR_INCLUDE_DIRS ${OVR_INCLUDE_DIR} ${OVR_SOURCE_DIR} ${_ovr_dependency_includes})
 	mark_as_advanced(OVR_ROOT_DIR)
 endif()
