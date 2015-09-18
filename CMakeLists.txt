@@ -54,10 +54,16 @@ target_link_libraries(com_osvr_OculusRift
 	${OVR_LIBRARIES}
 	jsoncpp_lib)
 
+include(GNUInstallDirs)
+if(NOT CMAKE_INSTALL_DOCDIR)
+	set(CMAKE_INSTALL_DOCDIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/${PROJECT_NAME})
+endif()
+
 install(FILES
 	CONTRIBUTING.md
 	README.md
 	LICENSE
 	NOTICE
-	DESTINATION .)
+	DESTINATION
+	${CMAKE_INSTALL_DOCDIR})
 
