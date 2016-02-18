@@ -170,7 +170,8 @@ list(APPEND _ovr_static_library_names
 	ovr
 	OVR
 	LibOVR
-	ovr${_ovr_libname_bitsuffix})
+	ovr${_ovr_libname_bitsuffix}
+	libovr${_ovr_libname_bitsuffix})
 
 list(APPEND _ovr_dynamic_library_debug_names
 	OVRRT${_ovr_libname_bitsuffix}
@@ -184,6 +185,7 @@ list(APPEND _ovr_static_library_debug_names
 	OVR
 	LibOVR
 	ovr${_ovr_libname_bitsuffix}d
+	libovr${_ovr_libname_bitsuffix}d
 	OVR${_ovr_libname_bitsuffix}d)
 
 find_library(OVR_DYNAMIC_LIBRARY_RELEASE
