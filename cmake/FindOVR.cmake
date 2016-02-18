@@ -122,15 +122,13 @@ endif()
 if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
 	set(_ovr_libname_bitsuffix "64")
 	set(_ovr_library_arch "x86_64")
-	if (WIN32)
-		set(_ovr_library_arch "x64")
-	endif(WIN32)
 else()
 	set(_ovr_libname_bitsuffix "32")
 	set(_ovr_library_arch "i386")
-	if (WIN32)
-		set(_ovr_library_arch "Win32")
-	endif(WIN32)
+endif()
+
+if(CMAKE_VS_PLATFORM_NAME)
+	set(_ovr_library_arch ${CMAKE_VS_PLATFORM_NAME})
 endif()
 
 # Test platform
@@ -148,14 +146,16 @@ list(APPEND _ovr_library_paths
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release/${_ovr_library_compiler}
-	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Release/${_ovr_library_compiler})
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Release/${_ovr_library_compiler}
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/${_ovr_library_compiler})
 
 list(APPEND _ovr_library_debug_paths
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug/${_ovr_library_arch}
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug
 	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug/${_ovr_library_compiler}
-	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Debug/${_ovr_library_compiler}
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/${_ovr_library_compiler})
 
 # Generate list of potential library names
 list(APPEND _ovr_dynamic_library_names
