@@ -74,7 +74,7 @@ set(OVR_ROOT_DIR
 # Lib/Windows/x64/Release/VS2012/LibOVR.lib
 # Lib/Windows/x64/Release/VS2013/LibOVR.lib
 #
-# Oculus 0.6.x
+# Oculus 0.6.x and above
 #
 # Lib/Windows/Win32/Release/VS2010/LibOVR.lib
 # Lib/Windows/Win32/Release/VS2012/LibOVR.lib
@@ -143,38 +143,48 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 endif()
 
 # Generate list of potential library locations
-list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release/${_ovr_library_arch})
-list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release)
-list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release)
-list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release/${_ovr_library_compiler})
-list(APPEND _ovr_library_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Release/${_ovr_library_compiler})
-list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug/${_ovr_library_arch})
-list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug)
-list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug)
-list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
-list(APPEND _ovr_library_debug_paths ${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
+list(APPEND _ovr_library_paths
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release/${_ovr_library_arch}
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Release
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Release/${_ovr_library_compiler}
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Release/${_ovr_library_compiler})
+
+list(APPEND _ovr_library_debug_paths
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug/${_ovr_library_arch}
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/Debug
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_operating_system}/${_ovr_library_arch}/Debug/${_ovr_library_compiler}
+	${OVR_LIBRARY_PATH_SUFFIX}/${_ovr_library_arch}/Debug/${_ovr_library_compiler})
 
 # Generate list of potential library names
-list(APPEND _ovr_dynamic_library_names OVRRT${_ovr_libname_bitsuffix})
-list(APPEND _ovr_dynamic_library_names OVRRT${_ovr_libname_bitsuffix}_0)
-list(APPEND _ovr_dynamic_library_names libOVRRT${_ovr_libname_bitsuffix}.so.5)
-list(APPEND _ovr_dynamic_library_names libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
-list(APPEND _ovr_static_library_names libovr.ax${_ovr_libname_bitsuffix})
-list(APPEND _ovr_static_library_names libovr.a)
-list(APPEND _ovr_static_library_names ovr)
-list(APPEND _ovr_static_library_names OVR)
-list(APPEND _ovr_static_library_names LibOVR)
-list(APPEND _ovr_static_library_names ovr${_ovr_libname_bitsuffix})
-list(APPEND _ovr_dynamic_library_debug_names OVRRT${_ovr_libname_bitsuffix})
-list(APPEND _ovr_dynamic_library_debug_names OVRRT${_ovr_libname_bitsuffix}_0)
-list(APPEND _ovr_dynamic_library_debug_names libOVRRT${_ovr_libname_bitsuffix}.so.5)
-list(APPEND _ovr_dynamic_library_debug_names libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
-list(APPEND _ovr_static_library_debug_names libovr.a)
-list(APPEND _ovr_static_library_debug_names ovr)
-list(APPEND _ovr_static_library_debug_names OVR)
-list(APPEND _ovr_static_library_debug_names LibOVR)
-list(APPEND _ovr_static_library_debug_names ovr${_ovr_libname_bitsuffix}d)
-list(APPEND _ovr_static_library_debug_names OVR${_ovr_libname_bitsuffix}d)
+list(APPEND _ovr_dynamic_library_names
+	OVRRT${_ovr_libname_bitsuffix}
+	OVRRT${_ovr_libname_bitsuffix}_0
+	libOVRRT${_ovr_libname_bitsuffix}.so.5
+	libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
+
+list(APPEND _ovr_static_library_names
+	libovr.ax${_ovr_libname_bitsuffix}
+	libovr.a
+	ovr
+	OVR
+	LibOVR
+	ovr${_ovr_libname_bitsuffix})
+
+list(APPEND _ovr_dynamic_library_debug_names
+	OVRRT${_ovr_libname_bitsuffix}
+	OVRRT${_ovr_libname_bitsuffix}_0
+	libOVRRT${_ovr_libname_bitsuffix}.so.5
+	libOVRRT${_ovr_libname_bitsuffix}_0.so.5)
+
+list(APPEND _ovr_static_library_debug_names
+	libovr.a
+	ovr
+	OVR
+	LibOVR
+	ovr${_ovr_libname_bitsuffix}d
+	OVR${_ovr_libname_bitsuffix}d)
 
 find_library(OVR_DYNAMIC_LIBRARY_RELEASE
 	NAMES
@@ -256,6 +266,7 @@ find_path(OVR_INCLUDE_DIR
 	"${_libdir}/../../.."
 	PATHS
 	"${OVR_ROOT_DIR}"
+	"${OVR_ROOT_DIR}/LibOVR"
 	PATH_SUFFIXES
 	include
 	Include
@@ -274,6 +285,7 @@ find_path(OVR_SOURCE_DIR
 	"${_libdir}/../../.."
 	PATHS
 	"${OVR_ROOT_DIR}"
+	"${OVR_ROOT_DIR}/LibOVR"
 	PATH_SUFFIXES
 	Src
 	Include
