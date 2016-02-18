@@ -78,16 +78,32 @@ inline OculusRiftManager::~OculusRiftManager()
     shutdown();
 }
 
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+void ovr_log_callback(uintptr_t /*user_data*/, int level, const char* message)
+{
+	std::cerr << "[OVR " << level << "] " << message << std::endl;
+}
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
 void ovr_log_callback(int level, const char* message)
 {
     std::cerr << "[OVR " << level << "] " << message << std::endl;
 }
+#endif
 
 inline bool OculusRiftManager::initialize()
 {
     std::cout << "[OSVR Oculus Rift] Initializing Oculus API..." << std::endl;
 
-#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
+
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+	ovrInitParams params = {
+		ovrInit_Debug | ovrInit_RequestVersion, // Flags
+		OVR_MINOR_VERSION,      // RequestedMinorVersion
+		ovr_log_callback,       // LogCallback
+		NULL,                   // UserData for LogCallback
+		0                       // ConnectionTimeoutSeconds
+	};
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
     ovrInitParams params = {
         ovrInit_Debug | ovrInit_RequestVersion, // Flags
         OVR_MINOR_VERSION,      // RequestedMinorVersion
@@ -98,7 +114,7 @@ inline bool OculusRiftManager::initialize()
 
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
     ovrResult result = ovr_Initialize(&params);
-    initialized_ = OVR_SUCCESS(ovrResult);
+    initialized_ = OVR_SUCCESS(result);
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
     ovrBool result = ovr_Initialize(&params);
     initialized_ = static_cast<bool>(result);
@@ -116,7 +132,7 @@ inline bool OculusRiftManager::initialize()
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
         ovrErrorInfo error_info;
         ovr_GetLastErrorInfo(&error_info);
-        evr_error_msg += std::string(": ") + error_info.ErrorString;
+        ovr_error_msg += std::string(": ") + error_info.ErrorString;
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
         const char* msg = ovrHmd_GetLastError(nullptr);
         ovr_error_msg += std::string(": ") + msg;
@@ -143,7 +159,11 @@ inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
     }
 
     // Detect attached HMDs.
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+	//ovr_GetHmdDesc(nullptr);
+#elif
     const int num_hmds_detected = ovrHmd_Detect();
+#endif
     if (oculusRifts_.empty()) {
         std::cout << "[OSVR Oculus Rift] Empty HMD vector." << std::endl;
     }
