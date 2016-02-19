@@ -29,6 +29,7 @@
 
 // Internal Includes
 #include "osvr_compiler_detection.h"    // for OSVR_NOTHROW
+#include "ovr_version.h"
 
 // Library/third-party includes
 #include <osvr/PluginKit/TrackerInterfaceC.h>
@@ -60,7 +61,13 @@ public:
     OSVR_ReturnCode update();
 
 private:
+    double getMonocularHorizontalFovDegrees() const;
+    double getMonocularVerticalFovDegrees() const;
+
     ovrHmd hmd_{nullptr};
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    ovrGraphicsLuid luid_;
+#endif
     osvr::pluginkit::DeviceToken deviceToken_;
     OSVR_TrackerDeviceInterface tracker_;
     OSVR_AnalogDeviceInterface analog_;
@@ -87,8 +94,6 @@ private:
         NUM_CHANNELS
     };
 
-    double getMonocularHorizontalFovDegrees() const;
-    double getMonocularVerticalFovDegrees() const;
 };
 
 #endif // INCLUDED_OculusRift_h_GUID_7157AB6B_88FC_44A6_8E1A_0686DF08FCBA

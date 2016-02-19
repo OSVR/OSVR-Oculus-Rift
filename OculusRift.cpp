@@ -27,7 +27,6 @@
 // Internal Includes
 #include "OculusRift.h"
 #include "osvr_compiler_detection.h"
-#include "ovr_version.h"
 #include "OculusRiftException.h"
 
 // Library/third-party includes
@@ -45,14 +44,21 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 {
     std::cout << "[Oculus Rift] Creating Oculus Rift..." << std::endl;
 
-#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    // Connect HMD
+    ovrResult result = ovr_Create(&hmd_, &luid_);
+    if (OVR_FAILURE(result)) {
+        const std::string msg = "Error creatinng HMD: " + getLastErrorMessage() + ".";
+        std::cerr << "[Oculus Rift] " << msg << std::endl;
+        throw OculusRiftException(msg);
+    }
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
     // Connect to HMD
     ovrResult result = ovrHmd_Create(index, &hmd_);
-    if (!OVR_SUCCESS(result)) {
-        ovrErrorInfo error_info;
-        ovr_GetLastErrorInfo(&error_info);
-        std::cerr << "[Oculus Rift] Error creating HMD handle: " << error_info.ErrorString << "." << std::endl;
-        throw OculusRiftException("Error creating HMD handle: " + std::string(error_info.ErrorString) + ".");
+    if (OVR_FAILURE(result)) {
+        const std::string msg = "Error creatinng HMD: " + getLastErrorMessage() + ".";
+        std::cerr << "[Oculus Rift] " << msg  << std::endl;
+        throw OculusRiftException(msg);
     }
 #else
     // Connect to HMD
