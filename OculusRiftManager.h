@@ -30,7 +30,7 @@
 // Internal Includes
 #include "OculusRift.h"
 #include "contains.h"
-#include "ovr_version.h"
+#include "OSVR_OVR_Version.h"
 #include "make_unique.h"
 #include "GetLastError.h"
 

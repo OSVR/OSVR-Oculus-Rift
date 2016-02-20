@@ -27,7 +27,7 @@
 #define INCLUDED_GetLastError_h_GUID_2DAD1C8D_FC01_4ABD_9130_D37C45B46867
 
 // Internal Includes
-#include "ovr_version.h"
+#include "OSVR_OVR_Version.h"
 
 // Library/third-party includes
 #include <OVR_CAPI.h>
