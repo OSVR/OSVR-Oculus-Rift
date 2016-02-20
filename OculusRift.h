@@ -29,7 +29,7 @@
 
 // Internal Includes
 #include "osvr_compiler_detection.h"    // for OSVR_NOTHROW
-#include "ovr_version.h"
+#include "OSVR_OVR_Version.h"
 
 // Library/third-party includes
 #include <osvr/PluginKit/TrackerInterfaceC.h>
@@ -64,7 +64,12 @@ private:
     double getMonocularHorizontalFovDegrees() const;
     double getMonocularVerticalFovDegrees() const;
 
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,8,0,0)
+    ovrSession hmd_{nullptr};
+#else
     ovrHmd hmd_{nullptr};
+#endif
+
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
     ovrGraphicsLuid luid_;
 #endif

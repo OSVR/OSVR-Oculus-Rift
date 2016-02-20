@@ -37,13 +37,14 @@
 
 inline std::string getLastErrorMessage()
 {
+    std::string error_msg;
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
     ovrErrorInfo error_info;
     ovr_GetLastErrorInfo(&error_info);
-    const std::string error_msg(error_info.ErrorString);
+    error_msg = std::string(error_info.ErrorString);
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
     const char* msg = ovrHmd_GetLastError(nullptr);
-    const std::string error_msg(msg);
+    error_msg = std::string(msg);
 #endif
     return error_msg;
 }

@@ -28,6 +28,7 @@
 #include "OculusRift.h"
 #include "osvr_compiler_detection.h"
 #include "OculusRiftException.h"
+#include "GetLastError.h"
 
 // Library/third-party includes
 #include <json/json.h>
@@ -72,8 +73,13 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     // Initialize tracking and sensor fusion
     const unsigned int supported_tracking_capabilities = ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position; // the tracking capabilities this driver will report
     const unsigned int required_tracking_capabilities = 0; // the tracking capabilities which must be supported by the HMD
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const ovrBool tracking_configured = ovr_ConfigureTracking(hmd_, supported_tracking_capabilities, required_tracking_capabilities);
+    // returns FALSE if the required tracking capabilities are not supported (e.g., camera isn't plugged in)
+#else
     const ovrBool tracking_configured = ovrHmd_ConfigureTracking(hmd_, supported_tracking_capabilities, required_tracking_capabilities);
     // returns FALSE if the required tracking capabilities are not supported (e.g., camera isn't plugged in)
+#endif
 
     detectTrackers();
 
@@ -92,40 +98,73 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 
 OculusRift::~OculusRift() OSVR_NOEXCEPT
 {
-    //ovrHmd_Destroy(hmd_);
+    destroy();
 }
 
 void OculusRift::destroy()
 {
     std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    ovr_Destroy(hmd_);
+#else
     ovrHmd_Destroy(hmd_);
+#endif
 }
 
 std::string OculusRift::getProductName() const
 {
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const auto hmd_desc = ovr_GetHmdDesc(hmd_);
+    return hmd_desc.ProductName;
+#else
     return hmd_->ProductName;
+#endif
 }
 
 std::string OculusRift::getManufacturer() const
 {
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const auto hmd_desc = ovr_GetHmdDesc(hmd_);
+    return hmd_desc.Manufacturer;
+#else
     return hmd_->Manufacturer;
+#endif
 }
 
 std::string OculusRift::getSerialNumber() const
 {
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const auto hmd_desc = ovr_GetHmdDesc(hmd_);
+    return hmd_desc.SerialNumber;
+#else
     return hmd_->SerialNumber;
+#endif
 }
 
 std::string OculusRift::getFirmwareVersion() const
 {
+
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const auto hmd_desc = ovr_GetHmdDesc(hmd_);
+    const auto fw_major = std::to_string(hmd_desc.FirmwareMajor);
+    const auto fw_minor = std::to_string(hmd_desc.FirmwareMinor);
+    return fw_major + "." + fw_minor;
+#else
     return std::to_string(hmd_->FirmwareMajor) + "." + std::to_string(hmd_->FirmwareMinor);
+#endif
 }
 
 unsigned int OculusRift::detectTrackers()
 {
     int num_trackers = 0;
 
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,8,0,0)
+    const ovrTrackingState ts = ovr_GetTrackingState(hmd_, 0.0, ovrFalse);
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const ovrTrackingState ts = ovr_GetTrackingState(hmd_, 0.0);
+#else
     const ovrTrackingState ts = ovrHmd_GetTrackingState(hmd_, ovr_GetTimeInSeconds());
+#endif
 
     // Can we track the HMD?
     if (ts.StatusFlags & ovrStatus_OrientationTracked) {
@@ -192,8 +231,13 @@ std::string OculusRift::getDisplayJson() const
     const double pitch_tilt = 0.0; // TODO
 
     // Resolution
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const double width = ovr_GetHmdDesc(hmd_).Resolution.w;
+    const double height = ovr_GetHmdDesc(hmd_).Resolution.h;
+#else
     const double width = hmd_->Resolution.w;
     const double height = hmd_->Resolution.h;
+#endif
     const double video_inputs = 1;
     const std::string display_mode = "horz_side_by_side";
 
@@ -236,11 +280,17 @@ std::string OculusRift::getDisplayJson() const
 
 double OculusRift::getMonocularHorizontalFovDegrees() const
 {
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const double left_eye_left_tan = ovr_GetHmdDesc(hmd_).DefaultEyeFov[ovrEye_Left].LeftTan;
+    const double left_eye_right_tan = ovr_GetHmdDesc(hmd_).DefaultEyeFov[ovrEye_Left].RightTan;
+    const double right_eye_left_tan = ovr_GetHmdDesc(hmd_).DefaultEyeFov[ovrEye_Right].LeftTan;
+    const double right_eye_right_tan = ovr_GetHmdDesc(hmd_).DefaultEyeFov[ovrEye_Right].RightTan;
+#else
     const double left_eye_left_tan = hmd_->DefaultEyeFov[ovrEye_Left].LeftTan;
     const double left_eye_right_tan = hmd_->DefaultEyeFov[ovrEye_Left].RightTan;
     const double right_eye_left_tan = hmd_->DefaultEyeFov[ovrEye_Right].LeftTan;
     const double right_eye_right_tan = hmd_->DefaultEyeFov[ovrEye_Right].RightTan;
-
+#endif
     const double left_eye_left_degrees = std::atan(left_eye_left_tan) * 180.0 / OSVR_PI;
     const double left_eye_right_degrees = std::atan(left_eye_right_tan) * 180.0 / OSVR_PI;
     const double right_eye_left_degrees = std::atan(right_eye_left_tan) * 180.0 / OSVR_PI;
@@ -254,9 +304,13 @@ double OculusRift::getMonocularHorizontalFovDegrees() const
 
 double OculusRift::getMonocularVerticalFovDegrees() const
 {
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const double left_eye_up_tan = ovr_GetHmdDesc(hmd_).DefaultEyeFov[ovrEye_Left].LeftTan;
+    const double left_eye_down_tan = ovr_GetHmdDesc(hmd_).DefaultEyeFov[ovrEye_Left].RightTan;
+#else
     const double left_eye_up_tan = hmd_->DefaultEyeFov[ovrEye_Left].LeftTan;
     const double left_eye_down_tan = hmd_->DefaultEyeFov[ovrEye_Left].RightTan;
-
+#endif
     const double left_eye_up_degrees = std::atan(left_eye_up_tan) * 180.0 / OSVR_PI;
     const double left_eye_down_degrees = std::atan(left_eye_down_tan) * 180.0 / OSVR_PI;
 
@@ -270,7 +324,13 @@ OSVR_ReturnCode OculusRift::update()
     std::cout << "[Oculus Rift] Updating tracker and analog values!" << std::endl;
 
     // Poll tracking data
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,8,0,0)
+    const ovrTrackingState ts = ovr_GetTrackingState(hmd_, 0.0, ovrFalse);
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+    const ovrTrackingState ts = ovr_GetTrackingState(hmd_, 0.0);
+#else
     const ovrTrackingState ts = ovrHmd_GetTrackingState(hmd_, ovr_GetTimeInSeconds());
+#endif
 
     if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
         // Both orientation and position are known

@@ -41,7 +41,7 @@ osvr_add_plugin(com_osvr_OculusRift
 	OculusRiftException.h
 	OculusRift.h
 	OculusRiftManager.h
-	ovr_version.h
+	OSVR_OVR_Version.h
 )
 
 target_include_directories(com_osvr_OculusRift
