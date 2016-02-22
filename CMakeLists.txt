@@ -37,7 +37,6 @@ osvr_add_plugin(com_osvr_OculusRift
 	com_osvr_OculusRift.cpp
 	OculusRift.cpp
 	contains.h
-	OculusRiftDetector.h
 	OculusRiftException.h
 	OculusRift.h
 	OculusRiftManager.h

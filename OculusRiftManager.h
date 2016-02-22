@@ -59,6 +59,7 @@ public:
     void shutdown();
 
     OSVR_ReturnCode detect(OSVR_PluginRegContext ctx);
+    OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx);
 
 private:
     bool initialized_{false};
@@ -153,7 +154,8 @@ inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
 #else
     const int num_hmds_detected = ovrHmd_Detect();
 #endif
-    std::cout << "[OSVR Oculus Rift] Detected " << num_hmds_detected << (num_hmds_detected != 1 ? " HMDs." : " HMD.") << std::endl;
+    std::cout << "[OSVR Oculus Rift] Detected " << num_hmds_detected
+        << (num_hmds_detected != 1 ? " HMDs." : " HMD.") << std::endl;
 
     // If not HMDs were detected and we still have a valid handle to one, we
     // should release that handle as the HMD has been unplugged.
@@ -174,7 +176,14 @@ inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
         }
     }
 
+    //osvr::pluginkit::registerObjectForDeletion(ctx, oculus_rift_manager);
+
     return OSVR_RETURN_SUCCESS;
+}
+
+inline OSVR_ReturnCode OculusRiftManager::operator()(OSVR_PluginRegContext ctx)
+{
+    return detect(ctx);
 }
 
 #endif // INCLUDED_OculusRiftManager_h_GUID_C573D70C_AA30_426B_BB75_8C30A96711A4

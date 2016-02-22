@@ -25,7 +25,6 @@
 
 // Internal Includes
 #include <osvr/PluginKit/PluginKit.h>
-#include "OculusRiftDetector.h"
 #include "OculusRiftManager.h"
 
 // Library/third-party includes
@@ -40,10 +39,7 @@ OSVR_PLUGIN(com_osvr_OculusRift) {
 
     osvr::pluginkit::PluginContext context{ctx};
 
-    OculusRiftManager* oculus_rift_manager{new OculusRiftManager{}};
-    osvr::pluginkit::registerObjectForDeletion(ctx, oculus_rift_manager);
-
-    context.registerHardwareDetectCallback(new OculusRiftDetector{oculus_rift_manager});
+    context.registerHardwareDetectCallback(new OculusRiftManager{});
 
     return OSVR_RETURN_SUCCESS;
 }

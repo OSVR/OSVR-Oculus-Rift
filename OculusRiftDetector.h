@@ -38,17 +38,17 @@
 
 class OculusRiftDetector {
 public:
-    OculusRiftDetector(OculusRiftManager* manager);
+    OculusRiftDetector();
 
     OSVR_ReturnCode detect(OSVR_PluginRegContext ctx);
 
     OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx);
 
 private:
-    OculusRiftManager* manager_;
+    std::unique_ptr<OculusRiftManager> manager_;
 };
 
-inline OculusRiftDetector::OculusRiftDetector(OculusRiftManager* manager) : manager_(manager)
+inline OculusRiftDetector::OculusRiftDetector() : manager_(new OculusRiftManager)
 {
     // do nothing
 }
