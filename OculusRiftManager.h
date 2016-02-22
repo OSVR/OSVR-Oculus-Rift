@@ -141,6 +141,7 @@ inline void OculusRiftManager::shutdown()
 inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
 {
     std::cout << "[OSVR Oculus Rift] Detecting Oculus Rifts..." << std::endl;
+    std::cout << "[OSVR Oculus Rift] Detection: context = " << ctx << std::endl;
     if (!initialized_) {
         // Initialize the Oculus API and get a count of connected HMDs.
         std::cout << "[OSVR Oculus Rift] OVR system not initialized. Initializing..." << std::endl;
