@@ -168,7 +168,11 @@ inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
             // If we detect an HMD and don't already have one created, we should
             // create it.
             const int index = 0;
-            oculusRift_ = std::make_unique<OculusRift>(ctx, index);
+            try {
+                oculusRift_ = std::make_unique<OculusRift>(ctx, index);
+            } catch (...) {
+                // do nothing
+            }
         } else {
             // If we detect an HMD and we already have on created, check to see
             // if they're the same. If they are, do nothing. If they're
