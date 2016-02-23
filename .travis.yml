@@ -16,6 +16,7 @@ cache:
   directories:
     $HOME/source
 install:
+  - export PATH=$HOME/osvr/bin:$PATH
   - pushd devtools
   - ./travis-install-dependencies.sh "${HOME}/osvr"
   - popd
