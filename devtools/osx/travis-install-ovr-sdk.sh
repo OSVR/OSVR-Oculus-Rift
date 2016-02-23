@@ -30,8 +30,8 @@ if [ -d ovr_sdk_osx_-${OVR_VERSION} ]; then
 fi
 
 # Build Oculus SDK
-curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_osx_${OVR_VERSION}.tar.xz -o ovr_sdk_osx_${OVR_VERSION}.tar.xz
-tar xf ovr_sdk_osx_${OVR_VERSION}.tar.xz
+curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_osx_${OVR_VERSION}.tar.gz -o ovr_sdk_osx_${OVR_VERSION}.tar.gz
+tar xf ovr_sdk_osx_${OVR_VERSION}.tar.gz
 pushd ovr_sdk_osx_${OVR_VERSION}
 make PREFIX="${PREFIX}" release install
 popd
