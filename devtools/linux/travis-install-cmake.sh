@@ -22,7 +22,7 @@ mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"
 
 # Download and build cmake
-if [ -f "${PREFIX}/bin/cmake"  ]; then
+if [ -d CMake ]; then
     pushd CMake
     git pull
     popd
