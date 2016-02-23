@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script installs OSVR-Core on the Travis CI Linux server.
+# This script installs cmake on the Travis CI Linux server.
 
 # Parameters:
 #  $1  Installation prefix
@@ -17,29 +17,22 @@ fi
 export PREFIX="$1"
 mkdir -p "${PREFIX}"
 
-# Build OSVR-Core dependencies
-./travis-install-cmake "${PREFIX}"
-./travis-install-jsoncpp.sh "${PREFIX}"
-./travis-install-libfunctionality.sh "${PREFIX}"
-./travis-install-opencv.sh "${PREFIX}"
-
 # Dependency source directories
 mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"
 
-# Download and build OSVR-Core
-if [ -d OSVR-Core ]; then
-    pushd OSVR-Core
+# Download and build cmake
+if [ -f "${PREFIX}/bin/cmake"  ]; then
+    pushd CMake
     git pull
-    git submodule update --init --recursive
     popd
 else
-    git clone --recursive https://github.com/OSVR/OSVR-Core.git
+    git clone --recursive https://github.com/Kitware/CMake.git
 fi
 
-# Build OSVR-Core
-mkdir -p OSVR-Core/build
-pushd OSVR-Core/build
+# Build cmake
+mkdir -p CMake/build
+pushd CMake/build
 cmake .. -DCMAKE_INSTALL_PREFIX="${PREFIX}" -DCMAKE_BUILD_TYPE="${CONFIG}"
 make -j2 install
 popd

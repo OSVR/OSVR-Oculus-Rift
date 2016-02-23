@@ -8,6 +8,8 @@ before_install_linux()
         export CXX="clang++-3.7" CC="clang-3.7"
     fi
 
+    export PATH="${PREFIX}"/bin:$PATH
+
     # Install OSVR-Core and its dependencies
     pushd linux
     ./travis-install-osvr-core.sh "$1"

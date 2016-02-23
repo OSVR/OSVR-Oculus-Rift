@@ -23,8 +23,8 @@ script:
   - git submodule update --init --recursive
   - mkdir build
   - cd build
-  - if [ $TRAVIS_OS_NAME = 'osx' ]; then cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH=${HOME}/osvr -DCMAKE_OSX_ARCHITECTURES=x86_64; fi
-  - if [ $TRAVIS_OS_NAME = 'linux' ]; then cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH=${HOME}/osvr; fi
+  - if [ $TRAVIS_OS_NAME = 'osx' ];   then cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH=${HOME}/osvr -DOVR_ROOT_DIR="${PREFIX}/ovr_sdk" -DCMAKE_OSX_ARCHITECTURES=x86_64; fi
+  - if [ $TRAVIS_OS_NAME = 'linux' ]; then cmake .. -DCMAKE_BUILD_TYPE=${CONFIG} -DCMAKE_PREFIX_PATH=${HOME}/osvr -DOVR_ROOT_DIR="${PREFIX}/ovr_sdk"; fi
   - make -j2
 sudo: false
 addons:
