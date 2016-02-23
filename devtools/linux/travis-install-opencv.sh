@@ -37,7 +37,7 @@ fi
 
 # Build OpenCV
 curl -LR https://github.com/Itseez/opencv/archive/${OPENCV_VERSION}.zip -o opencv-${OPENCV_VERSION}.zip
-unzip -o opencv-${OPENCV_VERSION}.zip
+unzip -qo opencv-${OPENCV_VERSION}.zip
 mkdir -p opencv-${OPENCV_VERSION}/build
 pushd opencv-${OPENCV_VERSION}/build
 cmake .. -DCMAKE_INSTALL_PREFIX="${PREFIX}" -DCMAKE_BUILD_TYPE=${CONFIG} -DWITH_IPP=OFF -DWITH_1394=OFF -DWITH_FFMPEG=OFF
