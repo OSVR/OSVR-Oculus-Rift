@@ -19,6 +19,9 @@ before_install_linux()
     pushd linux
     ./travis-install-ovr-sdk.sh "$1"
     popd
+
+    echo "File listing:"
+    find "${PREFIX}"
 }
 
 before_install_osx()

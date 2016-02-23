@@ -34,6 +34,7 @@ curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_linux_${OVR_VERSION}.ta
 tar xf ovr_sdk_linux_${OVR_VERSION}.tar.xz
 mv ovr_sdk_linux_${OVR_VERSION} ovr_sdk
 pushd ovr_sdk
+find .
 #make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" release install -j2
 make PREFIX="${PREFIX}" install -j2
 popd
