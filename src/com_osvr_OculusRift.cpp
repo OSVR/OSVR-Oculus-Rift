@@ -31,12 +31,10 @@
 // - none
 
 // Standard includes
-//#include <iostream>  // for debugging
+// - none
 
 OSVR_PLUGIN(com_osvr_OculusRift)
 {
-    //std::cout << "[OSVR Oculus Rift] OSVR_PLUGIN(com_osvr_OculusRift) called." << std::endl;
-
     osvr::pluginkit::PluginContext context{ctx};
     context.registerHardwareDetectCallback(new OculusRiftManager{});
 

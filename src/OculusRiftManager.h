@@ -1,5 +1,5 @@
 /** @file
-    @brief Header
+    @brief The Oculus Rift Manager detects and sets up Oculus Rifts.
 
     @date 2015
 

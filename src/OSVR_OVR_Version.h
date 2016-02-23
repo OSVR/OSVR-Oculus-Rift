@@ -1,5 +1,5 @@
 /** @file
-    @brief Header
+    @brief Version number testing of the Oculus SDK.
 
     @date 2015
 
@@ -74,12 +74,14 @@
                       OSVR_OVR_PATCH_VERSION)
 
 /**
- *  Convenience macros that can be used to specify a required version of the
+ * Convenience macros that can be used to specify a required version of the
  * Oculus Rift SDK.
  *
+ * <code>
  * #if OSVR_OVR_MIN_VERSION_REQUIRED(0, 5, 0, 1)
- *    your code here
+ *    // your code here
  * #endif
+ * </code>
  */
 //@{
 #define OSVR_OVR_MIN_VERSION_REQUIRED(PRODUCT, MAJOR, MINOR, PATCH) \
@@ -102,3 +104,4 @@
 //@}
 
 #endif // INCLUDED_OSVR_OVR_Version_h_GUID_7DA9A7F4_6465_461A_A50D_D37A65253F6B
+

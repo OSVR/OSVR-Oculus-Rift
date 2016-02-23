@@ -1,5 +1,5 @@
 /** @file
-    @brief Header
+    @brief Get the last error from the Oculus SDK.
 
     @date 2016
 

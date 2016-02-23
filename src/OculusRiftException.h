@@ -1,11 +1,11 @@
 /** @file
-@brief Header
+  @brief General exceptions for the Oculus Rift plugin.
 
-@date 2015
+  @date 2015
 
-@author
-Sensics, Inc.
-<http://sensics.com>
+  @author
+  Sensics, Inc.
+  <http://sensics.com>
 
 */
 
@@ -54,3 +54,4 @@ private:
 };
 
 #endif // INCLUDED_OculusRiftException_h_GUID_AF7C1708_4C46_42CA_B6F4_70E5644CFC63
+

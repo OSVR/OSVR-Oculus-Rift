@@ -1,5 +1,5 @@
 /** @file
-    @brief Implementation
+    @brief Handle for Oculus Rift HMD
 
     @date 2015
 
