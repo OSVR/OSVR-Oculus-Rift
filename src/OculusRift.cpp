@@ -43,8 +43,6 @@ OSVR_CONSTEXPR double OSVR_PI = 3.1415926535897932385;
 
 OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 {
-    std::cout << "[Oculus Rift] Creating Oculus Rift..." << std::endl;
-
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
     // Connect HMD
     ovrResult result = ovr_Create(&hmd_, &luid_);
@@ -83,8 +81,6 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 
     detectTrackers();
 
-    std::cout << getDisplayJson();
-
     OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
     osvrDeviceTrackerConfigure(opts, &tracker_);
     osvrDeviceAnalogConfigure(opts, &analog_, static_cast<OSVR_ChannelCount>(AnalogChannels::NUM_CHANNELS));
@@ -103,7 +99,6 @@ OculusRift::~OculusRift() OSVR_NOEXCEPT
 
 void OculusRift::destroy()
 {
-    std::cout << "[Oculus Rift] Destroying Oculus Rift..." << std::endl;
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
     ovr_Destroy(hmd_);
 #else
@@ -217,8 +212,6 @@ std::string OculusRift::getDeviceDescriptorJson() const
     std::ostringstream ostr;
     ostr << root;
 
-    std::cout << root;
-
     return ostr.str();
 }
 
@@ -321,8 +314,6 @@ double OculusRift::getMonocularVerticalFovDegrees() const
 
 OSVR_ReturnCode OculusRift::update()
 {
-    std::cout << "[Oculus Rift] Updating tracker and analog values!" << std::endl;
-
     // Poll tracking data
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,8,0,0)
     const ovrTrackingState ts = ovr_GetTrackingState(hmd_, 0.0, ovrFalse);
@@ -334,8 +325,6 @@ OSVR_ReturnCode OculusRift::update()
 
     if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
         // Both orientation and position are known
-        std::cout << "[Oculus Rift] Supports orientation and position tracking." << std::endl;
-
         const ovrPoseStatef head_state = ts.HeadPose;
         const ovrPosef head_pose = head_state.ThePose;
 
@@ -351,8 +340,6 @@ OSVR_ReturnCode OculusRift::update()
         osvrDeviceTrackerSendPose(deviceToken_, tracker_, &hmd_pose, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
     } else if (ts.StatusFlags & (ovrStatus_OrientationTracked)) {
         // Only the orientation is known
-        std::cout << "[Oculus Rift] Supports orientation tracking only." << std::endl;
-
         const ovrPoseStatef head_state = ts.HeadPose;
         const ovrPosef head_pose = head_state.ThePose;
 
@@ -365,8 +352,6 @@ OSVR_ReturnCode OculusRift::update()
         osvrDeviceTrackerSendOrientation(deviceToken_, tracker_, &hmd_orientation, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
     } else if (ts.StatusFlags & (ovrStatus_PositionTracked)) {
         // Only the position is known
-        std::cout << "[Oculus Rift] Supports position tracking only." << std::endl;
-
         const ovrPoseStatef head_state = ts.HeadPose;
         const ovrPosef head_pose = head_state.ThePose;
 
@@ -379,8 +364,6 @@ OSVR_ReturnCode OculusRift::update()
     }
 
     if (ts.StatusFlags & (ovrStatus_CameraPoseTracked)) {
-        std::cout << "[Oculus Rift] Supports camera pose tracking." << std::endl;
-
         OSVR_Pose3 camera_pose;
         camera_pose.translation.data[0] = ts.CameraPose.Position.x;
         camera_pose.translation.data[1] = ts.CameraPose.Position.y;

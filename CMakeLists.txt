@@ -1,6 +1,7 @@
 #
 # Oculus Rift plugin for OSVR
 #
+
 cmake_minimum_required(VERSION 3.1.0)
 project(com_osvr_OculusRift)
 
@@ -16,43 +17,15 @@ find_package(osvr REQUIRED)
 find_package(OVR REQUIRED)
 find_package(jsoncpp REQUIRED)
 
+
 #
-# Detect available C++ language, library, and compiler features
+# Plugin
 #
-include(WriteCompilerDetectionHeader)
-write_compiler_detection_header(
-	FILE "osvr_compiler_detection.h"
-	PREFIX OSVR
-	COMPILERS GNU Clang AppleClang MSVC
-	FEATURES cxx_override cxx_noexcept cxx_constexpr
-)
+add_subdirectory(src)
 
-include(CheckCXXSourceCompiles)
-set(CMAKE_REQUIRED_DEFINITIONS ${CMAKE_CXX11_STANDARD_COMPILE_OPTION})
-check_cxx_source_compiles("#include <memory>\nint main(int, char**) { std::unique_ptr<int> i = std::make_unique<int>(0); }" OSVR_HAS_STD_MAKE_UNIQUE)
-configure_file(osvr_compiler_tests.h.in "${CMAKE_CURRENT_BINARY_DIR}/osvr_compiler_tests.h")
-
-
-osvr_add_plugin(com_osvr_OculusRift
-	com_osvr_OculusRift.cpp
-	OculusRift.cpp
-	contains.h
-	OculusRiftException.h
-	OculusRift.h
-	OculusRiftManager.h
-	OSVR_OVR_Version.h
-)
-
-target_include_directories(com_osvr_OculusRift
-	PRIVATE
-	${OVR_INCLUDE_DIRS}
-	${CMAKE_CURRENT_BINARY_DIR})
-
-target_link_libraries(com_osvr_OculusRift
-	osvr::osvrPluginKitCpp
-	${OVR_LIBRARIES}
-	jsoncpp_lib)
-
+#
+# Documentation
+#
 include(GNUInstallDirs)
 if(NOT CMAKE_INSTALL_DOCDIR)
 	set(CMAKE_INSTALL_DOCDIR ${CMAKE_INSTALL_DATAROOTDIR}/doc/${PROJECT_NAME})

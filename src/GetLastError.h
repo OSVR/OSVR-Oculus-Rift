@@ -35,6 +35,13 @@
 // Standard includes
 #include <string>
 
+/**
+ * @brief Returns a string containing the most recent error message from the
+ * Oculus SDK.
+ *
+ * @return a string containing the most recent error message from the Oculus
+ * SDK.
+ */
 inline std::string getLastErrorMessage()
 {
     std::string error_msg;

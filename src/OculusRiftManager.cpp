@@ -1,5 +1,5 @@
 /** @file
-    @brief Header
+    @brief The Oculus Rift Manager detects and sets up Oculus Rifts.
 
     @date 2015
 
@@ -23,13 +23,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-#ifndef INCLUDED_OculusRiftManager_h_GUID_C573D70C_AA30_426B_BB75_8C30A96711A4
-#define INCLUDED_OculusRiftManager_h_GUID_C573D70C_AA30_426B_BB75_8C30A96711A4
-
 // Internal Includes
+#include "OculusRiftManager.h"
 #include "OculusRift.h"
-#include "contains.h"
 #include "OSVR_OVR_Version.h"
 #include "make_unique.h"
 #include "GetLastError.h"
@@ -40,38 +36,13 @@
 
 // Standard includes
 #include <iostream>
-#include <memory>
 
-class OculusRiftManager;
-using OculusRiftManagerSharedPtr = std::shared_ptr<OculusRiftManager>;
-using OculusRiftManagerPtr = std::unique_ptr<OculusRiftManager>;
-
-class OculusRiftManager {
-public:
-    OculusRiftManager();
-    ~OculusRiftManager();
-
-    // Oculus Rift Manager is non-copyable
-    OculusRiftManager(const OculusRiftManager&) = delete;
-    OculusRiftManager& operator=(const OculusRiftManager&) = delete;
-
-    bool initialize();
-    void shutdown();
-
-    OSVR_ReturnCode detect(OSVR_PluginRegContext ctx);
-    OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx);
-
-private:
-    bool initialized_{false};
-    std::unique_ptr<OculusRift> oculusRift_;
-};
-
-inline OculusRiftManager::OculusRiftManager()
+OculusRiftManager::OculusRiftManager()
 {
     initialize();
 }
 
-inline OculusRiftManager::~OculusRiftManager()
+OculusRiftManager::~OculusRiftManager()
 {
     shutdown();
 }
@@ -88,7 +59,7 @@ void ovr_log_callback(int level, const char* message)
 }
 #endif
 
-inline bool OculusRiftManager::initialize()
+bool OculusRiftManager::initialize()
 {
     std::cout << "[OSVR Oculus Rift] Initializing Oculus API..." << std::endl;
 
@@ -132,13 +103,13 @@ inline bool OculusRiftManager::initialize()
     return initialized_;
 }
 
-inline void OculusRiftManager::shutdown()
+void OculusRiftManager::shutdown()
 {
     std::cout << "[OSVR Oculus Rift] Shutting down Oculus API..." << std::endl;
     ovr_Shutdown();
 }
 
-inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
+OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
 {
     std::cout << "[OSVR Oculus Rift] Detecting Oculus Rifts..." << std::endl;
     std::cout << "[OSVR Oculus Rift] Detection: context = " << ctx << std::endl;
@@ -181,15 +152,11 @@ inline OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
         }
     }
 
-    //osvr::pluginkit::registerObjectForDeletion(ctx, oculus_rift_manager);
-
     return OSVR_RETURN_SUCCESS;
 }
 
-inline OSVR_ReturnCode OculusRiftManager::operator()(OSVR_PluginRegContext ctx)
+OSVR_ReturnCode OculusRiftManager::operator()(OSVR_PluginRegContext ctx)
 {
     return detect(ctx);
 }
-
-#endif // INCLUDED_OculusRiftManager_h_GUID_C573D70C_AA30_426B_BB75_8C30A96711A4
 
