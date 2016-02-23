@@ -17,14 +17,14 @@ fi
 export PREFIX="$1"
 mkdir -p "${PREFIX}"
 
+# Build OSVR-Core dependencies
+./travis-install-jsoncpp.sh "${PREFIX}"
+./travis-install-libfunctionality.sh "${PREFIX}"
+./travis-install-opencv.sh "${PREFIX}"
+
 # Dependency source directories
 mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"
-
-# Build OSVR-Core dependencies
-./travis-install-jsoncpp.sh
-./travis-install-libfunctionality.sh
-./travis-install-opencv.sh
 
 # Download and build OSVR-Core
 if [ -d OSVR-Core ]; then
