@@ -40,7 +40,7 @@ fi
 # Build OSVR-Core
 mkdir -p OSVR-Core/build
 pushd OSVR-Core/build
-cmake .. -DCMAKE_INSTALL_PREFIX="${PREFIX}" -DCMAKE_BUILD_TYPE="${CONFIG}"
+cmake .. -DCMAKE_INSTALL_PREFIX="${PREFIX}" -DCMAKE_BUILD_TYPE="${CONFIG}" -DOpenCV_DIR="${PREFIX}/share/OpenCV"
 make -j2 install
 popd
 
