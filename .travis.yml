@@ -16,7 +16,9 @@ cache:
   directories:
     $HOME/source
 install:
-  - ./devtools/travis-install-dependencies.sh "${HOME}/osvr"
+  - pushd devtools
+  - ./travis-install-dependencies.sh "${HOME}/osvr"
+  - popd
 script:
   - git submodule update --init --recursive
   - mkdir build
