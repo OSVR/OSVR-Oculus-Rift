@@ -19,22 +19,23 @@ fi
 export PREFIX="$1"
 mkdir -p "${PREFIX}"
 
+# If already installed, skip the rest
+if [ -e "${PREFIX}/lib/libOVR.a" ]; then
+    echo "OSVR is already installed."
+    exit 0
+fi
+
 # Dependency source directories
 mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"
-
-# Download and build Oculus SDK
-if [ -d ovr_sdk_linux_-${OVR_VERSION} ]; then
-    echo "Oculus SDK $OVR_VERSION has already been installed."
-    exit 0
-fi
 
 # Build Oculus SDK
 curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_linux_${OVR_VERSION}.tar.xz -o ovr_sdk_linux_${OVR_VERSION}.tar.xz
 tar xf ovr_sdk_linux_${OVR_VERSION}.tar.xz
 mv ovr_sdk_linux_${OVR_VERSION} ovr_sdk
 pushd ovr_sdk
-#make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" release install
+#make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" release install -j2
+make PREFIX="${PREFIX}" install -j2
 popd
 
 popd

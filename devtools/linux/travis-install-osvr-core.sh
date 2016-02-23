@@ -23,6 +23,12 @@ mkdir -p "${PREFIX}"
 ./travis-install-libfunctionality.sh "${PREFIX}"
 ./travis-install-opencv.sh "${PREFIX}"
 
+# If already installed, skip the rest
+if [ -e "${PREFIX}/lib/libosvrPluginKit.so" ]; then
+    echo "OSVR is already installed."
+    exit 0
+fi
+
 # Dependency source directories
 mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"

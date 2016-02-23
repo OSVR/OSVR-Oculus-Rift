@@ -17,6 +17,12 @@ fi
 export PREFIX="$1"
 mkdir -p "${PREFIX}"
 
+# If already installed, skip the rest
+if [ -e "${PREFIX}/lib/libjsoncpp.so" ]; then
+    echo "jsoncpp is already installed."
+    exit 0
+fi
+
 # Dependency source directories
 mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"

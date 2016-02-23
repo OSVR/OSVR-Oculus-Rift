@@ -14,7 +14,7 @@ matrix:
     compiler: gcc
 cache:
   directories:
-    $HOME/source
+    $HOME/osvr
 install:
   - export PATH=$HOME/osvr/bin:$PATH
   - pushd devtools
