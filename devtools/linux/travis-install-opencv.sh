@@ -24,7 +24,7 @@ mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"
 
 # Download and build OpenCV
-if [ -d opencv-${OPENCV_VERSION} ]; then
+if [ -e "${PREFIX}/lib/libopencv_core.so" ]; then
     echo "OpenCV $OPENCV_VERSION has already been installed."
     exit 0
 fi
