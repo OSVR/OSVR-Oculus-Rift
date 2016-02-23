@@ -18,7 +18,7 @@ export PREFIX="$1"
 mkdir -p "${PREFIX}"
 
 # Build OSVR-Core dependencies
-./travis-install-cmake "${PREFIX}"
+./travis-install-cmake.sh "${PREFIX}"
 ./travis-install-jsoncpp.sh "${PREFIX}"
 ./travis-install-libfunctionality.sh "${PREFIX}"
 ./travis-install-opencv.sh "${PREFIX}"
