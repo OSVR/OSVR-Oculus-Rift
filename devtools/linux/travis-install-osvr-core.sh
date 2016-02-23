@@ -21,7 +21,7 @@ mkdir -p "${PREFIX}"
 ./travis-install-cmake.sh "${PREFIX}"
 ./travis-install-jsoncpp.sh "${PREFIX}"
 ./travis-install-libfunctionality.sh "${PREFIX}"
-./travis-install-opencv.sh "${PREFIX}"
+#./travis-install-opencv.sh "${PREFIX}"
 
 # If already installed, skip the rest
 if [ -e "${PREFIX}/lib/libosvrPluginKit.so" ]; then
@@ -46,7 +46,21 @@ fi
 # Build OSVR-Core
 mkdir -p OSVR-Core/build
 pushd OSVR-Core/build
-cmake .. -DCMAKE_INSTALL_PREFIX="${PREFIX}" -DCMAKE_BUILD_TYPE="${CONFIG}" -DOpenCV_DIR="${PREFIX}/share/OpenCV"
+#cmake .. -DCMAKE_INSTALL_PREFIX="${PREFIX}" -DCMAKE_BUILD_TYPE="${CONFIG}" -DOpenCV_DIR="${PREFIX}/share/OpenCV"
+cmake .. -DCMAKE_PREFIX_PATH="${PREFIX}" -DCMAKE_INSTALL_PREFIX="${PREFIX}" \
+    -DBUILD_CLIENT=ON \
+    -DBUILD_CLIENT_APPS=OFF \
+    -DBUILD_CLIENT_EXAMPLES=OFF \
+    -DBUILD_DEV_VERBOSE=OFF \
+    -DBUILD_EXPERIMENTAL_APPS=OFF \
+    -DBUILD_HEADER_DEPENDENCY_TESTS=OFF \
+    -DBUILD_SERVER=ON \
+    -DBUILD_SERVER_APP=OFF \
+    -DBUILD_SERVER_EXAMPLES=OFF \
+    -DBUILD_SERVER_PLUGINS=OFF \
+    -DBUILD_TESTING=OFF \
+    -DBUILD_WITH_OPENCV=OFF \
+    -DBUILD_USBSERIALENUM=ON
 make -j2 install
 popd
 
