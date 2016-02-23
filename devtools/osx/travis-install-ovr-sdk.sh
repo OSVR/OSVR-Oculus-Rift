@@ -30,7 +30,7 @@ if [ -d ovr_sdk_osx_-${OVR_VERSION} ]; then
 fi
 
 # Build Oculus SDK
-mkdir -o ovr_sdk
+mkdir -p ovr_sdk
 pushd ovr_sdk
 curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_macos_${OVR_VERSION}.tar.gz -o ovr_sdk_macos_${OVR_VERSION}.tar.gz
 tar xf ovr_sdk_macos_${OVR_VERSION}.tar.gz
