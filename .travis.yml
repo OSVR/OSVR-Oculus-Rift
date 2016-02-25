@@ -22,9 +22,7 @@ install:
   - popd
 script:
   - git submodule update --init --recursive
-  - pushd devtools
-  - ./travis-build.sh "${HOME}/osvr"
-  - popd
+  - ./devtools/travis-build.sh "${HOME}/osvr"
 sudo: false
 addons:
   apt:
