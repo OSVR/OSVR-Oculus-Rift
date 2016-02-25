@@ -41,9 +41,10 @@ pushd OculusSDK
 for f in $(find . -iname "*.mk"); do sed -i.bak -e 's/-Werror//g' $f; done
 
 TARGET=$(echo ${CONFIG} | tr [:upper:] [:lower:])
-make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" ${TARGET} install -j2
-#make PREFIX="${PREFIX}" release install
+#make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" ${TARGET} install -j2
 popd
+
+cp -a OculusSDK "${PREFIX}"/
 
 popd
 
