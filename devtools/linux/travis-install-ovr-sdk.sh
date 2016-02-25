@@ -7,7 +7,7 @@
 
 set -o errexit # exit on first error
 set -o nounset # report unset variables
-#set +o xtrace  # show commands
+set +o xtrace  # show commands
 
 export OVR_VERSION=0.5.0.1
 
@@ -30,7 +30,8 @@ mkdir -p ~/source/"${CONFIG}"
 pushd ~/source/"${CONFIG}"
 
 # Build Oculus SDK
-curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_linux_${OVR_VERSION}.tar.xz -o ovr_sdk_linux_${OVR_VERSION}.tar.xz
+#curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_linux_${OVR_VERSION}.tar.xz -o ovr_sdk_linux_${OVR_VERSION}.tar.xz
+curl -LR https://kevin.godby.org/oculus/ovr_sdk_linux_${OVR_VERSION}.tar.xz -o ovr_sdk_linux_${OVR_VERSION}.tar.xz
 tar xf ovr_sdk_linux_${OVR_VERSION}.tar.xz
 mv ovr_sdk_linux_${OVR_VERSION} ovr_sdk
 
@@ -41,7 +42,6 @@ for f in $(find . -iname "*.mk"); do sed -i.bak -e 's/-Werror//g' $f; done
 
 TARGET=$(echo ${CONFIG} | tr [:upper:] [:lower:])
 make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" ${TARGET} install -j2
-#make PREFIX="${PREFIX}" install -j2
 popd
 
 popd

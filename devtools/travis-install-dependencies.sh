@@ -2,6 +2,10 @@
 
 # This script is executed by Travis CI during the before-install phase.
 
+set -o errexit # exit on first error
+set -o nounset # report unset variables
+set +o xtrace  # show commands
+
 before_install_linux()
 {
     if [ $CC = 'clang' ]; then

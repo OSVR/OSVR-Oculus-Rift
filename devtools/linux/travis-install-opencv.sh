@@ -7,7 +7,7 @@
 
 set -o errexit # exit on first error
 set -o nounset # report unset variables
-#set +o xtrace  # show commands
+set +o xtrace  # show commands
 
 export OPENCV_VERSION=3.1.0
 

@@ -2,6 +2,10 @@
 
 # This script is executed by Travis CI during the script (build) phase.
 
+set -o errexit # exit on first error
+set -o nounset # report unset variables
+set +o xtrace  # show commands
+
 if [ $# -ne 1 ]; then
     echo "Usage: $0 <installation prefix>"
     exit 1
