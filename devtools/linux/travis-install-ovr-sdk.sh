@@ -33,8 +33,12 @@ pushd ~/source/"${CONFIG}"
 curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_linux_${OVR_VERSION}.tar.xz -o ovr_sdk_linux_${OVR_VERSION}.tar.xz
 tar xf ovr_sdk_linux_${OVR_VERSION}.tar.xz
 mv ovr_sdk_linux_${OVR_VERSION} ovr_sdk
+
 pushd ovr_sdk
-find .
+
+# Strip out the -Werror compiler flag from makefiles
+for f in $(find . -iname "*.mk"); do sed -i.bak -e 's/-Werror//g' $f; done
+
 TARGET=$(echo ${CONFIG} | tr [:upper:] [:lower:])
 make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" ${TARGET} install -j2
 #make PREFIX="${PREFIX}" install -j2

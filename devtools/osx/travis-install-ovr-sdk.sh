@@ -35,10 +35,15 @@ pushd ovr_sdk
 curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_macos_${OVR_VERSION}.tar.gz -o ovr_sdk_macos_${OVR_VERSION}.tar.gz
 tar xf ovr_sdk_macos_${OVR_VERSION}.tar.gz
 pushd OculusSDK
+
+# Strip out the -Werror compiler flag from makefiles
+for f in $(find . -iname "*.mk"); do sed -i.bak -e 's/-Werror//g' $f; done
+
 TARGET=$(echo ${CONFIG} | tr [:upper:] [:lower:])
 make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" ${TARGET} install -j2
 #make PREFIX="${PREFIX}" release install
 popd
+
 popd
 
 popd
