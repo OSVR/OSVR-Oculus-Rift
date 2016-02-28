@@ -7,7 +7,7 @@
 
 set -o errexit # exit on first error
 set -o nounset # report unset variables
-#set +o xtrace  # show commands
+set +o xtrace  # show commands
 
 export OVR_VERSION=0.5.0.1
 
@@ -34,7 +34,7 @@ mkdir -p ovr_sdk
 pushd ovr_sdk
 #curl -LR https://static.oculus.com/sdk-downloads/ovr_sdk_macos_${OVR_VERSION}.tar.gz -o ovr_sdk_macos_${OVR_VERSION}.tar.gz
 curl -LR https://kevin.godby.org/oculus/ovr_sdk_macos_${OVR_VERSION}.tar.gz -o ovr_sdk_macos_${OVR_VERSION}.tar.gz
-tar xf ovr_sdk_macos_${OVR_VERSION}.tar.gz
+tar xvf ovr_sdk_macos_${OVR_VERSION}.tar.gz
 pushd OculusSDK
 
 # Strip out the -Werror compiler flag from makefiles
@@ -44,7 +44,7 @@ TARGET=$(echo ${CONFIG} | tr [:upper:] [:lower:])
 #make PREFIX="${PREFIX}" CC="${CC}" CXX="${CXX}" ${TARGET} install -j2
 popd
 
-cp -a OculusSDK "${PREFIX}"/
+cp -av OculusSDK "${PREFIX}"/
 
 popd
 
