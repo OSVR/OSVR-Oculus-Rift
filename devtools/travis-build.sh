@@ -31,8 +31,8 @@ if [ "$(uname)" = "Darwin" ]; then
         -DCMAKE_C_COMPILER=$(which ${CC}) \
         -DCMAKE_CXX_COMPILER=$(which ${CXX}) \
         -DCMAKE_BUILD_TYPE=${CONFIG} \
-        -DCMAKE_PREFIX_PATH=${HOME}/osvr \
-        -DOVR_ROOT_DIR="${HOME}/source/${CONFIG}/ovr_sdk" \
+        -DCMAKE_PREFIX_PATH=${PREFIX} \
+        -DOVR_ROOT_DIR="${PREFIX}/OculusSDK" \
         -DCMAKE_OSX_ARCHITECTURES=x86_64
 elif [ "$(uname)" = "Linux" ]; then
     if [ $CC = 'clang' ]; then
@@ -43,7 +43,7 @@ elif [ "$(uname)" = "Linux" ]; then
         -DCMAKE_C_COMPILER=$(which ${CC}) \
         -DCMAKE_CXX_COMPILER=$(which ${CXX}) \
         -DCMAKE_BUILD_TYPE=${CONFIG} \
-        -DCMAKE_PREFIX_PATH=${HOME}/osvr \
+        -DCMAKE_PREFIX_PATH=${PREFIX} \
         -DOVR_ROOT_DIR="${HOME}/source/${CONFIG}/ovr_sdk/OculusSDK"
 fi
 
