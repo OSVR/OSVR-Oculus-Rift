@@ -4,7 +4,7 @@
 
 set -o errexit # exit on first error
 set -o nounset # report unset variables
-set +o xtrace  # show commands
+set -o xtrace  # show commands
 
 before_install_linux()
 {

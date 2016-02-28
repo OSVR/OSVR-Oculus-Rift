@@ -7,7 +7,7 @@
 
 set -o errexit # exit on first error
 set -o nounset # report unset variables
-set +o xtrace  # show commands
+set -o xtrace  # show commands
 
 export OVR_VERSION=0.5.0.1
 
