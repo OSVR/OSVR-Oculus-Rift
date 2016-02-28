@@ -27,10 +27,6 @@ mkdir -p build
 pushd build
 
 if [ "$(uname)" = "Darwin" ]; then
-    if [ $CC = 'clang' ]; then
-        export CXX="clang++-3.7" CC="clang-3.7"
-    fi
-
     cmake .. \
         -DCMAKE_C_COMPILER=$(which ${CC}) \
         -DCMAKE_CXX_COMPILER=$(which ${CXX}) \
@@ -39,6 +35,10 @@ if [ "$(uname)" = "Darwin" ]; then
         -DOVR_ROOT_DIR="${HOME}/source/${CONFIG}/ovr_sdk" \
         -DCMAKE_OSX_ARCHITECTURES=x86_64
 elif [ "$(uname)" = "Linux" ]; then
+    if [ $CC = 'clang' ]; then
+        export CXX="clang++-3.7" CC="clang-3.7"
+    fi
+
     cmake .. \
         -DCMAKE_C_COMPILER=$(which ${CC}) \
         -DCMAKE_CXX_COMPILER=$(which ${CXX}) \
