@@ -1,0 +1,48 @@
+language: cpp
+compiler:
+  - clang
+  - gcc
+os:
+  - osx
+  - linux
+env:
+  - CONFIG=Release
+  - CONFIG=Debug
+matrix:
+  exclude:
+  - os: osx
+    compiler: gcc
+cache:
+  directories:
+    $HOME/osvr
+install:
+  - export PATH=$HOME/osvr/bin:$PATH
+  - pushd devtools
+  - ./travis-install-dependencies.sh "${HOME}/osvr"
+  - popd
+script:
+  - git submodule update --init --recursive
+  - ./devtools/travis-build.sh "${HOME}/osvr"
+sudo: false
+addons:
+  apt:
+    sources:
+    - boost-latest
+    - george-edison55-precise-backports
+    - ubuntu-toolchain-r-test
+    - llvm-toolchain-precise-3.7
+    packages:
+    - libboost-thread1.55-dev
+    - libboost-system1.55-dev
+    - libboost-date-time1.55-dev
+    - libboost-chrono1.55-dev
+    - libboost-program-options1.55-dev
+    - libboost-filesystem1.55-dev
+    - libusb-1.0-0-dev
+    - cmake-data
+    - cmake
+    - gcc-5
+    - g++-5
+    - clang-3.7
+    - libudev1
+    - libudev-dev

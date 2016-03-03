@@ -1,15 +1,15 @@
 /** @file
-    @brief Implementation
+    @brief Oculus Rift driver for OSVR.
+   devices.
 
-    @date 2014
+    @date 2015
 
     @author
-    Ryan Pavlik
-    <ryan@sensics.com>
-    <http://sensics.com>
+    Kevin M. Godby
+    <kevin@godby.org>
 */
 
-// Copyright 2014 Sensics, Inc.
+// Copyright 2015 Sensics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,27 +24,20 @@
 // limitations under the License.
 
 // Internal Includes
-#include "VRPNMultiserver.h"
+#include <osvr/PluginKit/PluginKit.h>
+#include "OculusRiftManager.h"
 
 // Library/third-party includes
 // - none
 
 // Standard includes
-#include <sstream>
+// - none
 
-std::string VRPNMultiserverData::getName(std::string const &nameStem) {
-    size_t num = assignNumber(nameStem);
-    std::ostringstream os;
-    os << nameStem << num;
-    return os.str();
+OSVR_PLUGIN(com_osvr_OculusRift)
+{
+    osvr::pluginkit::PluginContext context{ctx};
+    context.registerHardwareDetectCallback(new OculusRiftManager{});
+
+    return OSVR_RETURN_SUCCESS;
 }
 
-size_t VRPNMultiserverData::assignNumber(std::string const &nameStem) {
-    auto it = m_nameCount.find(nameStem);
-    if (it != end(m_nameCount)) {
-        it->second++;
-        return it->second;
-    }
-    m_nameCount[nameStem] = 0;
-    return 0;
-}
