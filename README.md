@@ -5,7 +5,7 @@
 >
 > For support, see <http://support.osvr.com>
 
-This is a plugin for OSVR that provides access to Oculus Rift trackers from OSVR applications. It makes use of the [Oculus VR SDK][ovr-sdk]. This plugin currently supports Oculus VR SDK versions 0.4.4-beta through 0.8.0.0-beta.
+This is a plugin for OSVR that provides access to Oculus Rift trackers from OSVR applications. It makes use of the [Oculus VR SDK][ovr-sdk]. This plugin currently supports Oculus VR SDK versions 0.4.4-beta through 1.3.0-public.
 
 [ovr-sdk]: https://developer.oculus.com/
 
