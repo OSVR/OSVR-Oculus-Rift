@@ -1,12 +1,3 @@
 {
-  "drivers": [
-    {
-      "plugin": "com_osvr_OculusRift",
-      "driver": "OculusRift",
-      "params": {
-        "index": 0
-      }
-    }
-  ],
   "display": "displays/Oculus_Rift_DK2.json"
 }
