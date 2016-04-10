@@ -71,7 +71,9 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     // Initialize tracking and sensor fusion
     const unsigned int supported_tracking_capabilities = ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position; // the tracking capabilities this driver will report
     const unsigned int required_tracking_capabilities = 0; // the tracking capabilities which must be supported by the HMD
-#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(1,1,3,0)
+    // do nothing as tracking is automatically configured in SDK version 1.3.0 and above
+#elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
     const ovrBool tracking_configured = ovr_ConfigureTracking(hmd_, supported_tracking_capabilities, required_tracking_capabilities);
     // returns FALSE if the required tracking capabilities are not supported (e.g., camera isn't plugged in)
 #else
@@ -83,7 +85,10 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
 
     OSVR_DeviceInitOptions opts = osvrDeviceCreateInitOptions(ctx);
     osvrDeviceTrackerConfigure(opts, &tracker_);
+#if OSVR_OVR_VERSION_LESS_THAN(1,1,3,0)
+    // Raw sensor data is no longer available in SDK > 1.3.0
     osvrDeviceAnalogConfigure(opts, &analog_, static_cast<OSVR_ChannelCount>(AnalogChannels::NUM_CHANNELS));
+#endif
 
     // Create the sync device token with the options
     std::string device_name = "OculusRift" + std::to_string(index);
@@ -166,10 +171,15 @@ unsigned int OculusRift::detectTrackers()
         num_trackers++;
     }
 
-    // Can we track the camera?
-    if (ts.StatusFlags & ovrStatus_CameraPoseTracked) {
+    // Get number of trackers/cameras (and multiple by two: one for normal pose, and once again for the leveled pose)
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(1,1,3,0)
+    num_trackers += 2 * ovr_GetTrackerCount(hmd_);
+#else
+    const bool camera_tracked = static_cast<bool>(ts.StatusFlags & ovrStatus_CameraPoseTracked);
+    if (camera_tracked) {
         num_trackers += 2; // first for camera, second for leveled camera
     }
+#endif
 
     numTrackers_ = num_trackers;
 
@@ -192,9 +202,12 @@ std::string OculusRift::getDeviceDescriptorJson() const
     root["interfaces"]["tracker"]["count"] = getTrackerCount();
     root["interfaces"]["tracker"]["position"] = true; // FIXME
     root["interfaces"]["tracker"]["orientation"] = true; // FIXME
-    root["interfaces"]["analog"]["count"] = 10; // FIXME
+#if OSVR_OVR_VERSION_LESS_THAN(1,1,3,0)
+    root["interfaces"]["analog"]["count"] = static_cast<int>(AnalogChannels::NUM_CHANNELS);
     //root["interfaces"]["analog"]["traits"] = {}; // FIXME
+#endif
     root["semantic"]["hmd"]["$target"] = "tracker/0";
+#if OSVR_OVR_VERSION_LESS_THAN(1,1,3,0)
     root["semantic"]["hmd"]["accelerometer"]["x"] = "analog/0";
     root["semantic"]["hmd"]["accelerometer"]["y"] = "analog/1";
     root["semantic"]["hmd"]["accelerometer"]["z"] = "analog/2";
@@ -205,6 +218,7 @@ std::string OculusRift::getDeviceDescriptorJson() const
     root["semantic"]["hmd"]["magnetometer"]["y"] = "analog/7";
     root["semantic"]["hmd"]["magnetometer"]["z"] = "analog/8";
     root["semantic"]["hmd"]["temperature"] = "analog/9";
+#endif
     root["semantic"]["camera"]["$target"] = "tracker/1";
     root["semantic"]["leveled_camera"]["$target"] = "tracker/2";
     root["automaticAliases"]["/me/head"] = "semantic/hmd";
@@ -323,7 +337,10 @@ OSVR_ReturnCode OculusRift::update()
     const ovrTrackingState ts = ovrHmd_GetTrackingState(hmd_, ovr_GetTimeInSeconds());
 #endif
 
-    if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
+    const bool head_orientation_tracked = static_cast<bool>(ts.StatusFlags & ovrStatus_OrientationTracked);
+    const bool head_position_tracked = static_cast<bool>(ts.StatusFlags & ovrStatus_PositionTracked);
+
+    if (head_position_tracked && head_orientation_tracked) {
         // Both orientation and position are known
         const ovrPoseStatef head_state = ts.HeadPose;
         const ovrPosef head_pose = head_state.ThePose;
@@ -338,7 +355,7 @@ OSVR_ReturnCode OculusRift::update()
         hmd_pose.rotation.data[3] = head_pose.Orientation.z;
 
         osvrDeviceTrackerSendPose(deviceToken_, tracker_, &hmd_pose, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
-    } else if (ts.StatusFlags & (ovrStatus_OrientationTracked)) {
+    } else if (head_orientation_tracked) {
         // Only the orientation is known
         const ovrPoseStatef head_state = ts.HeadPose;
         const ovrPosef head_pose = head_state.ThePose;
@@ -350,7 +367,7 @@ OSVR_ReturnCode OculusRift::update()
         hmd_orientation.data[3] = head_pose.Orientation.z;
 
         osvrDeviceTrackerSendOrientation(deviceToken_, tracker_, &hmd_orientation, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
-    } else if (ts.StatusFlags & (ovrStatus_PositionTracked)) {
+    } else if (head_position_tracked) {
         // Only the position is known
         const ovrPoseStatef head_state = ts.HeadPose;
         const ovrPosef head_pose = head_state.ThePose;
@@ -363,7 +380,43 @@ OSVR_ReturnCode OculusRift::update()
         osvrDeviceTrackerSendPosition(deviceToken_, tracker_, &hmd_position, static_cast<OSVR_ChannelCount>(TrackerChannels::HMD));
     }
 
-    if (ts.StatusFlags & (ovrStatus_CameraPoseTracked)) {
+#if OSVR_OVR_VERSION_GREATER_OR_EQUAL(1,1,3,0)
+    const unsigned int tracker_count = ovr_GetTrackerCount(hmd_);
+    for (unsigned int i = 0; i < tracker_count; ++i) {
+        ovrTrackerPose tracker_pose = ovr_GetTrackerPose(hmd_, i);
+        const bool is_connected = static_cast<bool>(tracker_pose.TrackerFlags & ovrTracker_Connected);
+        const bool is_pose_tracked = static_cast<bool>(tracker_pose.TrackerFlags & ovrTracker_PoseTracked);
+
+        if (!is_connected) // sensor is offline or absent
+            continue;
+
+        if (!is_pose_tracked) // pose is unavailable
+            continue;
+
+        OSVR_Pose3 camera_pose;
+        camera_pose.translation.data[0] = tracker_pose.Pose.Position.x;
+        camera_pose.translation.data[1] = tracker_pose.Pose.Position.y;
+        camera_pose.translation.data[2] = tracker_pose.Pose.Position.z;
+        camera_pose.rotation.data[0] = tracker_pose.Pose.Orientation.w;
+        camera_pose.rotation.data[1] = tracker_pose.Pose.Orientation.x;
+        camera_pose.rotation.data[2] = tracker_pose.Pose.Orientation.y;
+        camera_pose.rotation.data[3] = tracker_pose.Pose.Orientation.z;
+        osvrDeviceTrackerSendPose(deviceToken_, tracker_, &camera_pose, static_cast<OSVR_ChannelCount>(2*i + 1));
+
+        OSVR_Pose3 leveled_camera_pose;
+        leveled_camera_pose.translation.data[0] = tracker_pose.LeveledPose.Position.x;
+        leveled_camera_pose.translation.data[1] = tracker_pose.LeveledPose.Position.y;
+        leveled_camera_pose.translation.data[2] = tracker_pose.LeveledPose.Position.z;
+        leveled_camera_pose.rotation.data[0] = tracker_pose.LeveledPose.Orientation.w;
+        leveled_camera_pose.rotation.data[1] = tracker_pose.LeveledPose.Orientation.x;
+        leveled_camera_pose.rotation.data[2] = tracker_pose.LeveledPose.Orientation.y;
+        leveled_camera_pose.rotation.data[3] = tracker_pose.LeveledPose.Orientation.z;
+        osvrDeviceTrackerSendPose(deviceToken_, tracker_, &leveled_camera_pose, static_cast<OSVR_ChannelCount>(2*i + 2));
+    }
+#else
+    const bool camera_pose_tracked = static_cast<bool>(ts.StatusFlags & ovrStatus_CameraPoseTracked);
+
+    if (camera_pose_tracked) {
         OSVR_Pose3 camera_pose;
         camera_pose.translation.data[0] = ts.CameraPose.Position.x;
         camera_pose.translation.data[1] = ts.CameraPose.Position.y;
@@ -384,6 +437,10 @@ OSVR_ReturnCode OculusRift::update()
         leveled_camera_pose.rotation.data[3] = ts.LeveledCameraPose.Orientation.z;
         osvrDeviceTrackerSendPose(deviceToken_, tracker_, &leveled_camera_pose, static_cast<OSVR_ChannelCount>(TrackerChannels::LEVELED_CAMERA));
     }
+#endif
+
+#if OSVR_OVR_VERSION_LESS_THAN(1,1,3,0)
+    // Raw sensor data is no longer available in SDK > 1.3.0
 
     // Now for the analog interfaces
     const ovrSensorData sensor_data = ts.RawSensorData;
@@ -409,6 +466,7 @@ OSVR_ReturnCode OculusRift::update()
     // Temperature of sensor in degrees Celsius
     const float temperature = sensor_data.Temperature;
     osvrDeviceAnalogSetValue(deviceToken_, analog_, temperature, static_cast<OSVR_ChannelCount>(AnalogChannels::TEMPERATURE));
+#endif
 
     return OSVR_RETURN_SUCCESS;
 }

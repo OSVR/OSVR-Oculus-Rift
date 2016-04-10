@@ -115,8 +115,9 @@ elseif(MSVC11) # Microsoft Visual Studio 2012
 	set(_ovr_library_compiler "VS2012")
 elseif(MSVC12) # Microsoft Visual Studio 2013
 	set(_ovr_library_compiler "VS2013")
+elseif(MSVC14) # Microsoft Visual Studio 2015
+	set(_ovr_library_compiler "VS2015")
 endif()
-
 
 # Test 32/64 bits
 if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
@@ -346,14 +347,16 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(OVR
 	DEFAULT_MSG
 	OVR_LIBRARY
-	OVR_INCLUDE_DIR
 	OVR_SOURCE_DIR
 	${_ovr_dependencies}
 )
 
 if(OVR_FOUND)
 	set(OVR_LIBRARIES ${OVR_LIBRARY} ${_ovr_dependency_libraries} ${CMAKE_DL_LIBS})
-	set(OVR_INCLUDE_DIRS ${OVR_INCLUDE_DIR} ${OVR_SOURCE_DIR} ${_ovr_dependency_includes})
+	list(APPEND OVR_INCLUDE_DIRS ${OVR_SOURCE_DIR} ${_ovr_dependency_includes})
+	if (OVR_INCLUDE_DIR)
+		list(APPEND OVR_INCLUDE_DIRS ${OVR_INCLUDE_DIR})
+	endif()
 	mark_as_advanced(OVR_ROOT_DIR)
 endif()
 
