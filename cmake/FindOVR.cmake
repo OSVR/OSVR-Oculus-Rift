@@ -195,7 +195,6 @@ find_library(OVR_DYNAMIC_LIBRARY_RELEASE
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
-	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_paths}
 	lib
@@ -208,7 +207,6 @@ find_library(OVR_DYNAMIC_LIBRARY_DEBUG
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
-	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_debug_paths}
 	lib
@@ -221,7 +219,6 @@ find_library(OVR_STATIC_LIBRARY_RELEASE
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
-	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_paths}
 	lib
@@ -234,7 +231,6 @@ find_library(OVR_STATIC_LIBRARY_DEBUG
 	PATHS
 	"${OVR_ROOT_DIR}"
 	"${OVR_ROOT_DIR}/LibOVR"
-	c:/tools/oculus-sdk.install/OculusSDK/LibOVR
 	PATH_SUFFIXES
 	${_ovr_library_debug_paths}
 	lib
