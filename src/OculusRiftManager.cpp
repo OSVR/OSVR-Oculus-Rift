@@ -60,8 +60,7 @@ void ovr_log_callback(uintptr_t plugin_context, int level, const char* message)
     } else if (ovrLogLevel_Error == level) {
         severity = OSVR_LOGLEVEL_ERROR;
     }
-    ctx->log(severity, message)
-    std::cerr << "[Oculus Rift] " << message << std::endl;
+    ctx->log(severity, message);
 }
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
 void ovr_log_callback(int level, const char* message)
