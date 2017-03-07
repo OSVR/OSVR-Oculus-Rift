@@ -36,8 +36,9 @@
 
 // Standard includes
 #include <iostream>
+#include <string>
 
-OculusRiftManager::OculusRiftManager()
+OculusRiftManager::OculusRiftManager(OSVR_PluginRegContext context) : context_(context)
 {
     initialize();
 }
@@ -48,9 +49,19 @@ OculusRiftManager::~OculusRiftManager()
 }
 
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
-void ovr_log_callback(uintptr_t /*user_data*/, int level, const char* message)
+void ovr_log_callback(uintptr_t plugin_context, int level, const char* message)
 {
-    std::cerr << "[OVR " << level << "] " << message << std::endl;
+    auto ctx = reinterpret_cast<osvr::pluginkit::PluginContext*>(plugin_context);
+    OSVR_LogLevel severity = OSVR_LOGLEVEL_INFO;
+    if (ovrLogLevel_Debug == level) {
+        severity = OSVR_LOGLEVEL_DEBUG;
+    } else if (ovrLogLevel_Info == level) {
+        severity = OSVR_LOGLEVEL_INFO;
+    } else if (ovrLogLevel_Error == level) {
+        severity = OSVR_LOGLEVEL_ERROR;
+    }
+    ctx->log(severity, message)
+    std::cerr << "[Oculus Rift] " << message << std::endl;
 }
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
 void ovr_log_callback(int level, const char* message)
@@ -61,15 +72,14 @@ void ovr_log_callback(int level, const char* message)
 
 bool OculusRiftManager::initialize()
 {
-    std::cout << "[OSVR Oculus Rift] Initializing Oculus API..." << std::endl;
-
+    context_.log(OSVR_LOGLEVEL_TRACE, "Initializing Oculus API...");
 
 #if OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,7,0,0)
     ovrInitParams params = {
         ovrInit_Debug | ovrInit_RequestVersion, // Flags
         OVR_MINOR_VERSION,      // RequestedMinorVersion
         ovr_log_callback,       // LogCallback
-        NULL,                   // UserData for LogCallback
+        &context_,              // UserData for LogCallback
         0                       // ConnectionTimeoutSeconds
     };
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)
@@ -95,9 +105,10 @@ bool OculusRiftManager::initialize()
 #endif
 
     if (initialized_) {
-        std::cout << "[OSVR Oculus Rift] Oculus Rift initialized." << std::endl;
+        context_.log(OSVR_LOGLEVEL_TRACE, "Oculus Rift initialized.");
     } else {
-        std::cerr << "[OSVR Oculus Rift] Error initializing Oculus Rift system: " << getLastErrorMessage() << "." << std::endl;
+        const auto msg = "Error initializing Oculus Rift system: " + getLastErrorMessage() + ".";
+        context_.log(OSVR_LOGLEVEL_ERROR, msg.c_str());
     }
 
     return initialized_;
@@ -105,17 +116,16 @@ bool OculusRiftManager::initialize()
 
 void OculusRiftManager::shutdown()
 {
-    std::cout << "[OSVR Oculus Rift] Shutting down Oculus API..." << std::endl;
+    context_.log(OSVR_LOGLEVEL_TRACE, "Shutting down Oculus API...");
     ovr_Shutdown();
 }
 
 OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
 {
-    std::cout << "[OSVR Oculus Rift] Detecting Oculus Rifts..." << std::endl;
-    std::cout << "[OSVR Oculus Rift] Detection: context = " << ctx << std::endl;
+    context_.log(OSVR_LOGLEVEL_TRACE, "Detecting Oculus Rifts...");
     if (!initialized_) {
         // Initialize the Oculus API and get a count of connected HMDs.
-        std::cout << "[OSVR Oculus Rift] OVR system not initialized. Initializing..." << std::endl;
+        context_.log(OSVR_LOGLEVEL_WARN, "OVR system not initialized. Initializing...");
         initialize();
     }
 
@@ -126,8 +136,8 @@ OSVR_ReturnCode OculusRiftManager::detect(OSVR_PluginRegContext ctx)
 #else
     const int num_hmds_detected = ovrHmd_Detect();
 #endif
-    std::cout << "[OSVR Oculus Rift] Detected " << num_hmds_detected
-        << (num_hmds_detected != 1 ? " HMDs." : " HMD.") << std::endl;
+    const auto msg = "Detected " + std::to_string(num_hmds_detected) + (num_hmds_detected != 1 ? " HMDs." : " HMD.");
+    context_.log(OSVR_LOGLEVEL_TRACE, msg.c_str());
 
     // If not HMDs were detected and we still have a valid handle to one, we
     // should release that handle as the HMD has been unplugged.

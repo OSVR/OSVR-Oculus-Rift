@@ -47,23 +47,23 @@ OculusRift::OculusRift(OSVR_PluginRegContext ctx, int index)
     // Connect HMD
     ovrResult result = ovr_Create(&hmd_, &luid_);
     if (OVR_FAILURE(result)) {
-        const std::string msg = "Error creatinng HMD: " + getLastErrorMessage() + ".";
-        std::cerr << "[Oculus Rift] " << msg << std::endl;
+        const auto msg = "Error creatinng HMD: " + getLastErrorMessage() + ".";
+        osvrPluginLog(ctx, OSVR_LOGLEVEL_ERROR, msg.c_str());
         throw OculusRiftException(msg);
     }
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,6,0,0)
     // Connect to HMD
     ovrResult result = ovrHmd_Create(index, &hmd_);
     if (OVR_FAILURE(result)) {
-        const std::string msg = "Error creatinng HMD: " + getLastErrorMessage() + ".";
-        std::cerr << "[Oculus Rift] " << msg  << std::endl;
+        const auto msg = "Error creatinng HMD: " + getLastErrorMessage() + ".";
+        osvrPluginLog(ctx, OSVR_LOGLEVEL_ERROR, msg.c_str());
         throw OculusRiftException(msg);
     }
 #else
     // Connect to HMD
     hmd_ = ovrHmd_Create(index);
     if (!hmd_) {
-        std::cerr << "[Oculus Rift] Error creating HMD handle." << std::endl;
+        osvrPluginLog(ctx, OSVR_LOGLEVEL_ERROR, "Error creating HMD handle.");
         throw OculusRiftException("Error creating HMD handle.");
     }
 #endif

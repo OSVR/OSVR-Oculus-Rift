@@ -1,6 +1,5 @@
 /** @file
     @brief Oculus Rift driver for OSVR.
-   devices.
 
     @date 2015
 
@@ -36,7 +35,7 @@
 OSVR_PLUGIN(com_osvr_OculusRift)
 {
     osvr::pluginkit::PluginContext context{ctx};
-    context.registerHardwareDetectCallback(new OculusRiftManager{});
+    context.registerHardwareDetectCallback(new OculusRiftManager{ctx});
 
     return OSVR_RETURN_SUCCESS;
 }

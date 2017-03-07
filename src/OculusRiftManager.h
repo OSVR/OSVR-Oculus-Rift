@@ -38,7 +38,7 @@
 
 class OculusRiftManager {
 public:
-    OculusRiftManager();
+    OculusRiftManager(OSVR_PluginRegContext ctx);
     ~OculusRiftManager();
 
     // Oculus Rift Manager is non-copyable
@@ -52,6 +52,8 @@ public:
     OSVR_ReturnCode operator()(OSVR_PluginRegContext ctx);
 
 private:
+    //OSVR_PluginRegContext ctx_;
+    osvr::pluginkit::PluginContext context_;
     bool initialized_{false};
     std::unique_ptr<OculusRift> oculusRift_;
 };
