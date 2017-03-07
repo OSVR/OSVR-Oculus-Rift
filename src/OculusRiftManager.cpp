@@ -78,7 +78,7 @@ bool OculusRiftManager::initialize()
         ovrInit_Debug | ovrInit_RequestVersion, // Flags
         OVR_MINOR_VERSION,      // RequestedMinorVersion
         ovr_log_callback,       // LogCallback
-        &context_,              // UserData for LogCallback
+        reinterpret_cast<uintptr_t>(&context_), // UserData for LogCallback
         0                       // ConnectionTimeoutSeconds
     };
 #elif OSVR_OVR_VERSION_GREATER_OR_EQUAL(0,5,0,0)

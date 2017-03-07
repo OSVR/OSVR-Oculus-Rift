@@ -337,8 +337,8 @@ OSVR_ReturnCode OculusRift::update()
     const ovrTrackingState ts = ovrHmd_GetTrackingState(hmd_, ovr_GetTimeInSeconds());
 #endif
 
-    const bool head_orientation_tracked = static_cast<bool>(ts.StatusFlags & ovrStatus_OrientationTracked);
-    const bool head_position_tracked = static_cast<bool>(ts.StatusFlags & ovrStatus_PositionTracked);
+    const bool head_orientation_tracked = (ts.StatusFlags & ovrStatus_OrientationTracked) != 0;
+    const bool head_position_tracked = (ts.StatusFlags & ovrStatus_PositionTracked) != 0;
 
     if (head_position_tracked && head_orientation_tracked) {
         // Both orientation and position are known
@@ -384,8 +384,8 @@ OSVR_ReturnCode OculusRift::update()
     const unsigned int tracker_count = ovr_GetTrackerCount(hmd_);
     for (unsigned int i = 0; i < tracker_count; ++i) {
         ovrTrackerPose tracker_pose = ovr_GetTrackerPose(hmd_, i);
-        const bool is_connected = static_cast<bool>(tracker_pose.TrackerFlags & ovrTracker_Connected);
-        const bool is_pose_tracked = static_cast<bool>(tracker_pose.TrackerFlags & ovrTracker_PoseTracked);
+        const bool is_connected = (tracker_pose.TrackerFlags & ovrTracker_Connected) != 0;
+        const bool is_pose_tracked = (tracker_pose.TrackerFlags & ovrTracker_PoseTracked) != 0;
 
         if (!is_connected) // sensor is offline or absent
             continue;
