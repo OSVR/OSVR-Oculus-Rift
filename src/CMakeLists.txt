@@ -42,5 +42,5 @@ target_include_directories(com_osvr_OculusRift
 target_link_libraries(com_osvr_OculusRift
 	osvr::osvrPluginKitCpp
 	${OVR_LIBRARIES}
-	jsoncpp_lib)
+	JsonCpp::JsonCpp)
 

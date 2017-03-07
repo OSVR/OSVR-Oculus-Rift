@@ -15,7 +15,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #
 find_package(osvr REQUIRED)
 find_package(OVR REQUIRED)
-find_package(jsoncpp REQUIRED)
+find_package(JsonCpp REQUIRED)
 
 
 #
